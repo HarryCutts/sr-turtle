@@ -1,15 +1,14 @@
 #!/usr/bin/python2.7
 
 from sim_robot import SimRobot
-import time
 
 R = SimRobot()
 R.start()
 
+R.motors[0].target = 1
+R.motors[1].target = 2
+
 while True:
-    time.sleep(4)
-    R.set_speed(0)
-    R.set_spin_speed(45)
-    time.sleep(2)
-    R.set_spin_speed(0)
-    R.set_speed(50)
+    sl, sr = input("Enter two new speeds:")
+    R.motors[0].target = sl
+    R.motors[1].target = sr
