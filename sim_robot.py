@@ -1,8 +1,10 @@
 #!/usr/bin/python2.7
 
-import pygame, sys, os
+import pygame, sys, os, thread
 from pygame.locals import *
 from math import sin, cos, radians
+
+from ticker import *
 
 class SimRobot:
     _window_size = (640, 480)
@@ -48,6 +50,9 @@ class SimRobot:
 
     def set_speed(s, speed):
         s._speed = speed
+
+    def start(s):
+        thread.start_new(ticker, (0.015, s))
 
     def tick(s, time_passed):
         s.heading += s._spin_speed * time_passed

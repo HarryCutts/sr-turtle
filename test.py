@@ -3,16 +3,13 @@
 from sim_robot import SimRobot
 import time
 
-TICK_LENGTH = 0.015
-
 R = SimRobot()
+R.start()
 
-time.sleep(1)
-R.set_spin_speed(30)
-R.set_speed(60)
-
-while R.location[1] > -240:
-    time.sleep(TICK_LENGTH)
-    R.tick(TICK_LENGTH)
-
-raw_input()
+while True:
+    time.sleep(4)
+    R.set_speed(0)
+    R.set_spin_speed(45)
+    time.sleep(2)
+    R.set_spin_speed(0)
+    R.set_speed(50)
