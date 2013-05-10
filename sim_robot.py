@@ -1,6 +1,7 @@
 #!/usr/bin/python2.7
 
 import pygame, sys, os, thread
+import threading
 from pygame.locals import *
 from math import sin, cos, radians
 
@@ -8,8 +9,11 @@ from ticker import *
 
 class SimRobot:
     _window_size = (640, 480)
+
     location = (0, 0)
     heading = 0
+
+    _lock = threading.Lock()
 
     _spin_speed = 0  # degrees/s
     _speed = 0       # in pixels/s
@@ -46,15 +50,20 @@ class SimRobot:
     ## "Public" methods ##
 
     def set_spin_speed(s, spin_speed):
+        s._lock.acquire()
         s._spin_speed = spin_speed
+        s._lock.release()
 
     def set_speed(s, speed):
+        s._lock.acquire()
         s._speed = speed
+        s._lock.release()
 
     def start(s):
         thread.start_new(ticker, (0.015, s))
 
     def tick(s, time_passed):
+        s._lock.acquire()
         s.heading += s._spin_speed * time_passed
         dist = s._speed * time_passed
         heading_rads = radians(s.heading)
@@ -63,3 +72,4 @@ class SimRobot:
         x, y = s.location
         s.location = (x + xmod, y + ymod)
         s._draw()
+        s._lock.release()
