@@ -3,7 +3,7 @@
 import pygame, sys, os, thread
 import threading
 from pygame.locals import *
-from math import sin, cos, degrees
+from math import pi, sin, cos, degrees
 
 from ticker import *
 
@@ -87,8 +87,8 @@ class SimRobot(object):
             else:
                 sa = (sl + sr) / 2
                 theta = sa * t / r
-                d = (r * sin(theta)) * sin((180 - theta) / 2)
-                phi = 90 - (180 - theta) / 2
+                d = (r * sin(theta)) * sin((pi - theta) / 2)
+                phi = 0.5*pi - (pi - theta) / 2
 
         # Work out how this translates to coordinates
         dx = d * cos(phi + s.heading)
