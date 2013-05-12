@@ -1,5 +1,7 @@
 #!/usr/bin/python2.7
 
+from __future__ import division
+
 import pygame, sys, os, thread
 import threading
 from pygame.locals import *
