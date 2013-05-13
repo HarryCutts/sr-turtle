@@ -2,8 +2,7 @@
 
 from sim_robot import SimRobot
 
-R = SimRobot()
-R.start()
+R = SimRobot(display)
 
 R.motors[0].target = 1
 R.motors[1].target = 2

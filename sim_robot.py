@@ -7,9 +7,7 @@ import threading
 from pygame.locals import *
 from math import pi, sin, cos, degrees
 
-from ticker import *
-
-PIXELS_PER_METER = 100
+_robot_png = None
 
 class Motor(object):
     _target = 0
@@ -23,13 +21,13 @@ class Motor(object):
 
     @target.setter
     def target(s, value):
-        s._robot._lock.acquire()
+        s._robot.lock.acquire()
         s._target = value
-        s._robot._lock.release()
+        s._robot.lock.release()
 
 class SimRobot(object):
     _origin_offset = (320, 240)
-    _lock = threading.Lock()
+    lock = threading.RLock()
 
     width = 0.48
 
@@ -40,32 +38,11 @@ class SimRobot(object):
 
     ## Constructor ##
 
-    def __init__(s):
+    def __init__(s, display):
         s.motors = [Motor(s), Motor(s)]
-        # Display code
-        pygame.init()
-        s._window = pygame.display.set_mode((640, 480))
-        pygame.display.set_caption("SR Robot Simulator")
-        s._screen = pygame.display.get_surface()
-        s._robot_png = pygame.image.load("robot.png").convert()
-        s._draw()
+        display.objects.append(s)
 
     ## Internal methods ##
-
-    def _to_pixel_coord(s, world_coord):
-        x, y = world_coord
-        x, y = (x * PIXELS_PER_METER, y * PIXELS_PER_METER)
-        return (x + s._origin_offset[0], y + s._origin_offset[1])
-
-    def _draw(s):
-        robot_surface = pygame.transform.rotate(s._robot_png, \
-                degrees(s.heading))
-        rw, rh = robot_surface.get_size()
-        x, y = s._to_pixel_coord(s.location)
-        screen_location = (x - rw / 2., y - rh / 2.)
-        s._screen.fill((0, 0, 0))
-        s._screen.blit(robot_surface, screen_location)
-        pygame.display.flip()
 
     def _calculate_movement(s, t):
         sl, sr = s.motors[0].target, s.motors[1].target
@@ -99,14 +76,17 @@ class SimRobot(object):
 
     ## "Public" methods ##
 
-    def start(s):
-        thread.start_new(ticker, (0.015, s))
+    def get_surface(s):
+        global _robot_png
+        if _robot_png == None:
+            _robot_png = pygame.image.load("robot.png").convert()
+        with s.lock:
+            return pygame.transform.rotate(_robot_png, degrees(s.heading))
 
     def tick(s, time_passed):
-        s._lock.acquire()
+        s.lock.acquire()
         dx, dy, dh = s._calculate_movement(time_passed)
         x, y = s.location
         s.location = (x + dx, y + dy)
         s.heading += dh
-        s._draw()
-        s._lock.release()
+        s.lock.release()
