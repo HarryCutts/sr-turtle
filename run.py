@@ -1,6 +1,6 @@
 #!/usr/bin/python2.7
 
-import thread, time
+import thread, time, pygame
 
 from display import Display
 from sim_robot import SimRobot
@@ -12,8 +12,16 @@ def run_user_code():
 
 thread.start_new_thread(run_user_code, ())
 
-while True:
-    display.tick(0.03)
-    time.sleep(0.03)
+clock = pygame.time.Clock()
 
-input()
+done = False
+
+while done == False:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            done = True
+
+    display.tick(0.03)
+    clock.tick(30)
+
+pygame.quit()
