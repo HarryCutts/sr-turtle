@@ -1,11 +1,15 @@
 #!/usr/bin/python2.7
 
+from __future__ import division
+
 import thread, time, pygame
 
+from arena import Arena
 from display import Display
 from sim_robot import SimRobot
 
-display = Display()
+arena = Arena()
+display = Display(arena)
 
 def run_user_code():
     execfile('test.py')
@@ -21,7 +25,7 @@ while done == False:
         if event.type == pygame.QUIT:
             done = True
 
-    display.tick(0.03)
+    display.tick(1/30)
     clock.tick(30)
 
 pygame.quit()

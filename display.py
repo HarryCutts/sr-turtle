@@ -14,8 +14,8 @@ def to_pixel_coord(world_coord):
 
 class Display(object):
 
-    def __init__(s, objects=[]):
-        s.objects = objects
+    def __init__(s, arena):
+        s.arena = arena
 
         pygame.init()
         s._window = pygame.display.set_mode((640, 480))
@@ -25,12 +25,12 @@ class Display(object):
         s._draw()
 
     def _draw(s):
-        if s.objects == None or len(s.objects) == 0:
+        if len(s.arena.objects) == 0:
             return
 
         s._screen.fill((0, 0, 0))
 
-        for o in s.objects:
+        for o in s.arena.objects:
             with o.lock:
                 object_surface = o.get_surface()
                 ow, oh = object_surface.get_size()
@@ -43,7 +43,6 @@ class Display(object):
     ## Public Methods ##
 
     def tick(s, time_passed):
-        for o in s.objects:
-            o.tick(time_passed)
-
+        s.arena.tick(time_passed)
+        # TODO: Allow multiple displays on one arena without them all ticking it
         s._draw()
