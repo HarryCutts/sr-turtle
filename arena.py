@@ -2,6 +2,8 @@ from __future__ import division
 
 class Arena(object):
 
+    size = (8, 8)
+
     def __init__(s, objects=[]):
         s.objects = objects
 
