@@ -65,7 +65,6 @@ class SimRobot(object):
                 theta = (sr * t) / (0.5 * w)
             else:
                 sa = (sl + sr) / 2
-                print sa
                 theta = sa * t / r
                 d = (r * sin(theta)) * sin((pi - theta) / 2)
                 phi = 0.5*pi - (pi - theta) / 2
