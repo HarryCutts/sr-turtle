@@ -5,7 +5,7 @@ from __future__ import division
 import pygame, sys, os, thread
 import threading
 from pygame.locals import *
-from math import pi, sin, cos, degrees
+from math import pi, sin, cos, degrees, hypot
 
 _robot_png = None
 
@@ -26,7 +26,6 @@ class Motor(object):
         s._robot.lock.release()
 
 class SimRobot(object):
-    _origin_offset = (320, 240)
     lock = threading.RLock()
 
     width = 0.48
@@ -39,10 +38,22 @@ class SimRobot(object):
     ## Constructor ##
 
     def __init__(s, arena):
+        s.arena = arena
         s.motors = [Motor(s), Motor(s)]
         arena.objects.append(s)
 
     ## Internal methods ##
+
+    def _calculate_corners(s, location=location, heading=heading):
+        corners = []
+        r = hypot(s.width / 2, s.width / 2)
+        x, y = location
+        angle = pi / 4
+        while angle < 2 * pi:
+            corners.append((x + r * cos(heading + angle), y + r * sin(heading + angle)))
+            angle += pi / 2
+
+        return corners
 
     def _calculate_movement(s, t):
         sl, sr = s.motors[0].target, s.motors[1].target
@@ -83,10 +94,25 @@ class SimRobot(object):
         with s.lock:
             return pygame.transform.rotate(_robot_png, degrees(s.heading))
 
+    def move_and_rotate(s, dx, dy, dh):
+        x, y = s.location
+        new_location = (x + dx, y + dy)
+        new_heading = s.heading + dh
+        new_corners = s._calculate_corners(new_location, new_heading)
+        for c in new_corners:
+            if not s.arena.contains_point(c):
+                return False
+
+        s.location = new_location
+        s.heading = new_heading
+        return True
+
+    unstuck = False
     def tick(s, time_passed):
         s.lock.acquire()
         dx, dy, dh = s._calculate_movement(time_passed)
-        x, y = s.location
-        s.location = (x + dx, y + dy)
-        s.heading += dh
+        new_unstuck = s.move_and_rotate(dx, dy, dh)
+        if s.unstuck != new_unstuck:
+            s.unstuck = new_unstuck
+            print "Unstuck" if s.unstuck else "Stuck at " + str(s.location)
         s.lock.release()
