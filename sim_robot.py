@@ -95,24 +95,30 @@ class SimRobot(object):
             return pygame.transform.rotate(_robot_png, degrees(s.heading))
 
     def move_and_rotate(s, dx, dy, dh):
+        # TODO: Move right up to the arena edge when colliding
         x, y = s.location
         new_location = (x + dx, y + dy)
         new_heading = s.heading + dh
         new_corners = s._calculate_corners(new_location, new_heading)
+        can_move = [True, True]
+        friction_factor = 1
         for c in new_corners:
-            if not s.arena.contains_point(c):
-                return False
+            inside, dimension = s.arena.contains_point(c)
+            if not inside:
+                can_move[dimension] = False
+                # Reduce overall movement to account for friction
+                friction_factor = friction_factor * 0.3
 
-        s.location = new_location
+        # TODO: Turn towards the wall when pushing against it
+
+        s.location = (x + (dx * friction_factor) if can_move[0] else x, \
+                      y + (dy * friction_factor) if can_move[1] else y)
+
         s.heading = new_heading
-        return True
+        return can_move[0] and can_move[1]
 
-    unstuck = False
     def tick(s, time_passed):
         s.lock.acquire()
         dx, dy, dh = s._calculate_movement(time_passed)
-        new_unstuck = s.move_and_rotate(dx, dy, dh)
-        if s.unstuck != new_unstuck:
-            s.unstuck = new_unstuck
-            print "Unstuck" if s.unstuck else "Stuck at " + str(s.location)
+        s.move_and_rotate(dx, dy, dh)
         s.lock.release()

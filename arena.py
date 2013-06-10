@@ -22,7 +22,12 @@ class Arena(object):
 
     def contains_point(s, point):
         x, y = point
-        return (s.left < x < s.right) and (s.top < y < s.bottom)
+        if not (s.left < x < s.right):
+            return False, 0
+        elif not (s.top < y < s.bottom):
+            return False, 1
+        else:
+            return True, -1
 
     def tick(s, time_passed):
         for o in s.objects:
