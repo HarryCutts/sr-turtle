@@ -16,14 +16,12 @@ class Motor(object):
         s._robot = robot
 
     @property
-    def target(s):
-        return s._target
+    def target(s):  return s._target
 
     @target.setter
     def target(s, value):
-        s._robot.lock.acquire()
-        s._target = value
-        s._robot.lock.release()
+        with s._robot.lock:
+            s._target = value
 
 class SimRobot(object):
     lock = threading.RLock()
@@ -33,6 +31,7 @@ class SimRobot(object):
     location = (0, 0)
     heading = 0
 
+    arena = None
     motors = None
 
     ## Constructor ##
@@ -118,7 +117,6 @@ class SimRobot(object):
         return can_move[0] and can_move[1]
 
     def tick(s, time_passed):
-        s.lock.acquire()
-        dx, dy, dh = s._calculate_movement(time_passed)
-        s.move_and_rotate(dx, dy, dh)
-        s.lock.release()
+        with s.lock:
+            dx, dy, dh = s._calculate_movement(time_passed)
+            s.move_and_rotate(dx, dy, dh)

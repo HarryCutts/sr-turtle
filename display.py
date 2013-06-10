@@ -24,13 +24,9 @@ class Display(object):
         s._window = pygame.display.set_mode((arena_w * PIXELS_PER_METER, arena_h * PIXELS_PER_METER))
         pygame.display.set_caption("SR Turtle Robot Simulator")
         s._screen = pygame.display.get_surface()
-        s._robot_png = pygame.image.load("robot.png").convert()
         s._draw()
 
     def _draw(s):
-        if len(s.arena.objects) == 0:
-            return
-
         s._screen.fill((0, 0, 0))
 
         for o in s.arena.objects:
