@@ -7,8 +7,6 @@ import threading
 from pygame.locals import *
 from math import pi, sin, cos, degrees, hypot
 
-_robot_png = None
-
 class Motor(object):
     _target = 0
 
@@ -24,12 +22,13 @@ class Motor(object):
             s._target = value
 
 class SimRobot(object):
-    lock = threading.RLock()
-
     width = 0.48
 
     location = (0, 0)
     heading = 0
+
+    lock = threading.RLock()
+    surface_name = 'robot.png'
 
     arena = None
     motors = None
@@ -85,13 +84,6 @@ class SimRobot(object):
         return dx, dy, theta
 
     ## "Public" methods ##
-
-    def get_surface(s):
-        global _robot_png
-        if _robot_png == None:
-            _robot_png = pygame.image.load("robot.png").convert()
-        with s.lock:
-            return pygame.transform.rotate(_robot_png, degrees(s.heading))
 
     def move_and_rotate(s, dx, dy, dh):
         # TODO: Move right up to the arena edge when colliding

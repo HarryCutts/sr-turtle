@@ -14,6 +14,14 @@ def to_pixel_coord(world_coord, arena):
     x, y = ((x + offset_x) * PIXELS_PER_METER, (y + offset_y) * PIXELS_PER_METER)
     return (x, y)
 
+sprites = {}
+
+def get_surface(name):
+    if not name in sprites:
+        sprites[name] = pygame.image.load(name).convert()
+
+    return sprites[name]
+
 class Display(object):
 
     def __init__(s, arena):
@@ -31,11 +39,12 @@ class Display(object):
 
         for o in s.arena.objects:
             with o.lock:
-                object_surface = o.get_surface()
-                ow, oh = object_surface.get_size()
+                surface = get_surface(o.surface_name)
+                surface = pygame.transform.rotate(surface, degrees(o.heading))
+                object_width, object_height = surface.get_size()
                 x, y = to_pixel_coord(o.location, s.arena)
-                screen_location = (x - ow / 2., y - oh / 2.)
-                s._screen.blit(object_surface, screen_location)
+                screen_location = (x - object_width / 2., y - object_height / 2.)
+                s._screen.blit(surface, screen_location)
 
         pygame.display.flip()
 
