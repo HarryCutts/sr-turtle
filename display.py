@@ -27,12 +27,16 @@ class Display(object):
     def __init__(s, arena):
         s.arena = arena
 
-        pygame.init()
+        pygame.display.init()
         arena_w, arena_h = s.arena.size
         s._window = pygame.display.set_mode((arena_w * PIXELS_PER_METER, arena_h * PIXELS_PER_METER))
         pygame.display.set_caption("SR Turtle Robot Simulator")
         s._screen = pygame.display.get_surface()
         s._draw()
+
+    def __del__(s):
+        print "Display destructor"
+        pygame.display.quit()
 
     def _draw(s):
         s._screen.fill((0, 0, 0))
