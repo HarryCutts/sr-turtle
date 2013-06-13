@@ -3,11 +3,10 @@
 from sim_robot import SimRobot
 
 R = SimRobot(arena)
+markers = R.see()
 
-R.motors[0].target = 1
-R.motors[1].target = 2
+print "I can see", len(markers), "markers:"
 
-while True:
-    sl, sr = input("Enter two new speeds:")
-    R.motors[0].target = sl
-    R.motors[1].target = sr
+for m in markers:
+    if m.info.marker_type == MARKER_TOKEN:
+        print " - Token {0} is {1} metres away".format(m.info.offset, m.dist)

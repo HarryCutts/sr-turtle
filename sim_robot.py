@@ -2,11 +2,14 @@
 
 from __future__ import division
 
-import pygame, sys, os
+import pygame, time
 from pygame.locals import *
-from math import pi, sin, cos, degrees, hypot
+from math import pi, sin, cos, degrees, hypot, atan2
 
 from game_object import GameObject
+from vision import Marker, Point, PolarCoord
+
+HALF_FOV_WIDTH = pi / 4
 
 class Motor(object):
     _target = 0
@@ -83,7 +86,7 @@ class SimRobot(GameObject):
         dy = -d * sin(phi + s.heading)
         return dx, dy, theta
 
-    ## "Public" methods ##
+    ## "Public" methods for simulator code ##
 
     def move_and_rotate(s, move_by, dh):
         # TODO: Move right up to the arena edge when colliding
@@ -131,3 +134,30 @@ class SimRobot(GameObject):
         with s.lock:
             dx, dy, dh = s._calculate_movement(time_passed)
             s.move_and_rotate((dx, dy), dh)
+
+    ## "Public" methods for user code ##
+
+    def see(s, res=(800,600)):
+        with s.lock:
+            x, y = s.location
+            heading = s.heading
+
+        acq_time = time.time()
+
+        def object_filter(o):
+            # Choose only marked objects within the field of view
+            direction = atan2(o.location[1] - y, o.location[0] - x)
+            return o.marker_info != None \
+                   and -HALF_FOV_WIDTH < direction - heading < HALF_FOV_WIDTH
+
+        def marker_map(o):
+            # Turn a marked object into a Marker
+            rel_x, rel_y = (o.location[0] - x, o.location[1] - y)
+            polar_coord = PolarCoord(length=hypot(rel_x, rel_y), \
+                                     rot_y=degrees(atan2(rel_y, rel_x)) - heading)
+            return Marker(info=o.marker_info,
+                          centre=Point(polar_coord),
+                          res=res,
+                          timestamp=acq_time)
+
+        return map(marker_map, filter(object_filter, s.arena.objects))
