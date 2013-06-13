@@ -31,5 +31,5 @@ class Arena(object):
 
     def tick(s, time_passed):
         for o in s.objects:
-            o.tick(time_passed)
-            # TODO: allow objects without tick methods
+            if hasattr(o, "tick"):
+                o.tick(time_passed)

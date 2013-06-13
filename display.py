@@ -18,7 +18,7 @@ sprites = {}
 
 def get_surface(name):
     if not name in sprites:
-        sprites[name] = pygame.image.load(name).convert()
+        sprites[name] = pygame.image.load(name).convert_alpha()
 
     return sprites[name]
 
@@ -35,20 +35,20 @@ class Display(object):
         s._draw()
 
     def __del__(s):
-        print "Display destructor"
         pygame.display.quit()
 
     def _draw(s):
         s._screen.fill((0, 0, 0))
 
         for o in s.arena.objects:
-            with o.lock:
-                surface = get_surface(o.surface_name)
-                surface = pygame.transform.rotate(surface, degrees(o.heading))
-                object_width, object_height = surface.get_size()
-                x, y = to_pixel_coord(o.location, s.arena)
-                screen_location = (x - object_width / 2., y - object_height / 2.)
-                s._screen.blit(surface, screen_location)
+            if o.surface_name != None:
+                with o.lock:
+                    surface = get_surface(o.surface_name)
+                    surface = pygame.transform.rotate(surface, degrees(o.heading))
+                    object_width, object_height = surface.get_size()
+                    x, y = to_pixel_coord(o.location, s.arena)
+                    screen_location = (x - object_width / 2., y - object_height / 2.)
+                    s._screen.blit(surface, screen_location)
 
         pygame.display.flip()
 
