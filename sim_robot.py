@@ -2,10 +2,11 @@
 
 from __future__ import division
 
-import pygame, sys, os, thread
-import threading
+import pygame, sys, os
 from pygame.locals import *
 from math import pi, sin, cos, degrees, hypot
+
+from game_object import GameObject
 
 class Motor(object):
     _target = 0
@@ -21,29 +22,27 @@ class Motor(object):
         with s._robot.lock:
             s._target = value
 
-class SimRobot(object):
+class SimRobot(GameObject):
     width = 0.48
 
-    location = (0, 0)
-    heading = 0
-
-    lock = threading.RLock()
     surface_name = 'robot.png'
 
-    arena = None
     motors = None
 
     ## Constructor ##
 
     def __init__(s, arena):
-        s.arena = arena
+        GameObject.__init__(s, arena)
         s.motors = [Motor(s), Motor(s)]
         s.corners = s._calculate_corners()
         arena.objects.append(s)
 
     ## Internal methods ##
 
-    def _calculate_corners(s, location=location, heading=heading):
+    def _calculate_corners(s, location=None, heading=None):
+        if location == None: location = s.location
+        if heading == None:  heading = s.heading
+
         corners = []
         r = hypot(s.width / 2, s.width / 2)
         x, y = location
