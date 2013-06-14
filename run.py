@@ -16,7 +16,7 @@ NUM_TOKENS = 10
 arena = Arena()
 
 for i in range(NUM_TOKENS):
-    token = Token(arena, create_marker_info_by_type(MARKER_TOKEN, i))
+    token = Token(arena, i)
     token.location = (random() * 4 - 2, random() * 4 - 2)
     arena.objects.append(token)
 
