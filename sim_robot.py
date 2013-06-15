@@ -154,7 +154,8 @@ class SimRobot(GameObject):
             # Turn a marked object into a Marker
             rel_x, rel_y = (o.location[0] - x, o.location[1] - y)
             polar_coord = PolarCoord(length=hypot(rel_x, rel_y), \
-                                     rot_y=degrees(atan2(rel_y, rel_x)) - heading)
+                                     rot_y=degrees(atan2(rel_y, rel_x) - heading))
+            # TODO: Check polar coordinates are the right way around
             return Marker(info=o.marker_info,
                           centre=Point(polar_coord),
                           res=res,
