@@ -2,14 +2,22 @@
 
 from __future__ import division
 
-import pygame, time
+import pygame, time, exceptions
 from pygame.locals import *
 from math import pi, sin, cos, degrees, hypot, atan2
 
 from game_object import GameObject
 from vision import Marker, Point, PolarCoord
 
-HALF_FOV_WIDTH = pi / 4
+GRAB_RADIUS = 0.4
+HALF_GRAB_SECTOR_WIDTH = pi / 4
+HALF_FOV_WIDTH = pi / 6
+
+GRABBER_OFFSET = 0.25
+
+class AlreadyHoldingSomethingException(exceptions.Exception):
+    def __str__(s):
+        return "The robot is already holding something."
 
 class Motor(object):
     _target = 0
@@ -31,6 +39,8 @@ class SimRobot(GameObject):
     surface_name = 'robot.png'
 
     motors = None
+
+    _holding = None
 
     ## Constructor ##
 
@@ -133,6 +143,9 @@ class SimRobot(GameObject):
 
         if can_rotate or can_move[0] or can_move[1]:
             s.corners = new_corners
+            if s._holding != None:
+                s._holding.location = (x + cos(s.heading) * GRABBER_OFFSET, \
+                                       y + sin(s.heading) * GRABBER_OFFSET)
 
     def tick(s, time_passed):
         with s.lock:
@@ -140,6 +153,39 @@ class SimRobot(GameObject):
             s.move_and_rotate((dx, dy), dh)
 
     ## "Public" methods for user code ##
+
+    def grab(s):
+        if s._holding != None:
+            raise AlreadyHoldingSomethingException()
+
+        with s.lock:
+            x, y = s.location
+            heading = s.heading
+
+        def object_filter(o):
+            rel_x, rel_y = (o.location[0] - x, o.location[1] - y)
+            direction = atan2(rel_y, rel_x)
+            distance = hypot(rel_x, rel_y)
+            return o.grabbable and distance <= GRAB_RADIUS and \
+                   -HALF_GRAB_SECTOR_WIDTH < direction - heading < HALF_GRAB_SECTOR_WIDTH
+
+        objects = filter(object_filter, s.arena.objects)
+        if len(objects) > 0:
+            s._holding = objects[0]
+            s._holding.grab()
+            s._holding.location = (x + cos(heading) * GRABBER_OFFSET, \
+                                   y + sin(heading) * GRABBER_OFFSET)
+            return True
+        else:
+            return False
+
+    def release(s):
+        if s._holding != None:
+            s._holding.release()
+            s._holding = None
+            return True
+        else:
+            return False
 
     def see(s, res=(800,600)):
         with s.lock:

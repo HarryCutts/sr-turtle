@@ -5,6 +5,7 @@ class GameObject(object):
 
     surface_name = None
     marker_info = None
+    grabbable = False
 
     location = (0, 0)
     heading = 0
