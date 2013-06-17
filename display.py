@@ -44,7 +44,7 @@ class Display(object):
             if o.surface_name != None:
                 with o.lock:
                     surface = get_surface(o.surface_name)
-                    surface = pygame.transform.rotate(surface, degrees(o.heading))
+                    surface = pygame.transform.rotate(surface, -degrees(o.heading))
                     object_width, object_height = surface.get_size()
                     x, y = to_pixel_coord(o.location, s.arena)
                     screen_location = (x - object_width / 2., y - object_height / 2.)

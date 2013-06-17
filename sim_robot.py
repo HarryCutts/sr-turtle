@@ -82,9 +82,9 @@ class SimRobot(GameObject):
                 phi = 0.5*pi - (pi - theta) / 2
 
         # Work out how this translates to coordinates
-        dx = d * cos(phi + s.heading)
-        dy = -d * sin(phi + s.heading)
-        return dx, dy, theta
+        dx = d * cos(phi - s.heading)
+        dy = -d * sin(phi - s.heading)
+        return dx, dy, -theta
 
     ## "Public" methods for simulator code ##
 
@@ -92,6 +92,10 @@ class SimRobot(GameObject):
         # TODO: Move right up to the arena edge when colliding
         x, y = s.location
         new_heading = s.heading + dh
+        if new_heading > pi:
+            new_heading -= 2 * pi
+        elif new_heading < -pi:
+            new_heading += 2 * pi
         new_location = (x + move_by[0], y + move_by[1])
         new_corners = s._calculate_corners(new_location, new_heading)
         can_move = [True, True]
