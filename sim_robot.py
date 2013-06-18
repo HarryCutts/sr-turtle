@@ -96,10 +96,7 @@ class SimRobot(GameObject):
         dy = -d * sin(phi - s.heading)
         return dx, dy, -theta
 
-    ## "Public" methods for simulator code ##
-
-    def move_and_rotate(s, move_by, dh):
-        # TODO: Move right up to the arena edge when colliding
+    def _move_and_rotate(s, move_by, dh):
         x, y = s.location
         new_heading = s.heading + dh
         if new_heading > pi:
@@ -147,10 +144,12 @@ class SimRobot(GameObject):
                 s._holding.location = (x + cos(s.heading) * GRABBER_OFFSET, \
                                        y + sin(s.heading) * GRABBER_OFFSET)
 
+    ## "Public" methods for simulator code ##
+
     def tick(s, time_passed):
         with s.lock:
             dx, dy, dh = s._calculate_movement(time_passed)
-            s.move_and_rotate((dx, dy), dh)
+            s._move_and_rotate((dx, dy), dh)
 
     ## "Public" methods for user code ##
 
@@ -165,8 +164,7 @@ class SimRobot(GameObject):
         def object_filter(o):
             rel_x, rel_y = (o.location[0] - x, o.location[1] - y)
             direction = atan2(rel_y, rel_x)
-            distance = hypot(rel_x, rel_y)
-            return o.grabbable and distance <= GRAB_RADIUS and \
+            return o.grabbable and hypot(rel_x, rel_y) <= GRAB_RADIUS and \
                    -HALF_GRAB_SECTOR_WIDTH < direction - heading < HALF_GRAB_SECTOR_WIDTH
 
         objects = filter(object_filter, s.arena.objects)
