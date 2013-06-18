@@ -11,6 +11,10 @@ class Arena(object):
 
     size = (6, 6)
 
+    zone_size = 1
+
+    motif_name = 'sr_round_flat.png'
+
     @property
     def left(s):   return -s.size[0] / 2
     @property
