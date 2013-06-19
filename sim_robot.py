@@ -9,6 +9,9 @@ from math import pi, sin, cos, degrees, hypot, atan2
 from game_object import GameObject
 from vision import Marker, Point, PolarCoord
 
+SPEED_SCALE_FACTOR = 0.02
+MAX_MOTOR_SPEED = 100
+
 GRAB_RADIUS = 0.4
 HALF_GRAB_SECTOR_WIDTH = pi / 4
 HALF_FOV_WIDTH = pi / 6
@@ -30,6 +33,7 @@ class Motor(object):
 
     @target.setter
     def target(s, value):
+        value = min(max(value, -MAX_MOTOR_SPEED), MAX_MOTOR_SPEED)
         with s._robot.lock:
             s._target = value
 
@@ -67,7 +71,7 @@ class SimRobot(GameObject):
         return corners
 
     def _calculate_movement(s, t):
-        sl, sr = s.motors[0].target, s.motors[1].target
+        sl, sr = s.motors[0].target * SPEED_SCALE_FACTOR, s.motors[1].target * SPEED_SCALE_FACTOR
         w = s.width
 
         # To be calculated

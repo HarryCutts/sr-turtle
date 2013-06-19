@@ -41,7 +41,7 @@ while True:
 
         else:
             print "Can't see anything."
-            turn(0.5, 0.3)
+            turn(25, 0.3)
             time.sleep(0.2)
 
     elif state == DRIVING:
@@ -56,22 +56,22 @@ while True:
                 print "Found it!"
                 if R.grab():
                     print "Gotcha!"
-                    turn(1, 0.5)
-                    drive(1, 1)
+                    turn(50, 0.5)
+                    drive(50, 1)
                     R.release()
-                    drive(-1, 0.5)
+                    drive(-50, 0.5)
                 else:
                     print "Aww, I'm not close enough."
                 exit()
 
             elif -15 <= m.rot_y <= 15:
                 print "Ah, that'll do."
-                drive(1.0, 0.5)
+                drive(50, 0.5)
 
             elif m.rot_y < -15:
                 print "Left a bit..."
-                turn(-0.25, 0.5)
+                turn(-12.5, 0.5)
 
             elif m.rot_y > 15:
                 print "Right a bit..."
-                turn (0.25, 0.5)
+                turn (12.5, 0.5)
