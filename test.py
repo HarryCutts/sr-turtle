@@ -1,6 +1,4 @@
-#!/usr/bin/python2.7
-
-from sim_robot import SimRobot
+from sr import *
 
 import time
 
@@ -8,8 +6,7 @@ SEARCHING, DRIVING = range(2)
 
 R = SimRobot(arena)
 
-def token_filter(m):
-    return m.info.marker_type == MARKER_TOKEN
+token_filter = lambda m: m.info.marker_type == MARKER_TOKEN
 
 def drive(speed, seconds):
     global R

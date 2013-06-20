@@ -7,9 +7,7 @@ from random import random
 
 from arena import Arena
 from display import Display
-from sim_robot import SimRobot
 from markers import Token
-from vision import *
 
 NUM_TOKENS = 10
 
@@ -23,7 +21,7 @@ for i in range(NUM_TOKENS):
 display = Display(arena)
 
 def run_user_code():
-    execfile('test.py')
+    execfile('test.py', {"arena": arena})
 
 thread.start_new_thread(run_user_code, ())
 

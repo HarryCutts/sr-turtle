@@ -1,5 +1,5 @@
 from game_object import GameObject
-from vision import create_marker_info_by_type, MARKER_TOKEN, MARKER_ARENA
+from sr.vision import create_marker_info_by_type, MARKER_TOKEN, MARKER_ARENA
 
 class Token(GameObject):
     surface_name = 'token.png'
