@@ -48,11 +48,11 @@ class SimRobot(GameObject):
 
     ## Constructor ##
 
-    def __init__(s, arena):
-        GameObject.__init__(s, arena)
+    def __init__(s, simulator):
+        GameObject.__init__(s, simulator.arena)
         s.motors = [Motor(s), Motor(s)]
         s.corners = s._calculate_corners()
-        arena.objects.append(s)
+        simulator.arena.objects.append(s)
 
     ## Internal methods ##
 

@@ -1,10 +1,12 @@
+from simulator import Simulator
 from sr import *
 
 import time
 
 SEARCHING, DRIVING = range(2)
 
-R = SimRobot(arena)
+sim = Simulator(num_tokens=7)
+R = SimRobot(sim)
 
 token_filter = lambda m: m.info.marker_type == MARKER_TOKEN
 
