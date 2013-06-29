@@ -40,7 +40,7 @@ class Motor(object):
 class SimRobot(GameObject):
     width = 0.48
 
-    surface_name = 'robot.png'
+    surface_name = 'sr/robot.png'
 
     motors = None
 
