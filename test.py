@@ -1,4 +1,3 @@
-from simulator import Simulator
 from sr import *
 
 import time
