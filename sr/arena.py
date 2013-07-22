@@ -16,13 +16,17 @@ class Arena(object):
     motif_name = 'sr/sr_round_flat.png'
 
     @property
-    def left(s):   return -s.size[0] / 2
+    def left(s):
+        return -s.size[0] / 2
     @property
-    def right(s):  return s.size[0] / 2
+    def right(s):
+        return s.size[0] / 2
     @property
-    def top(s):    return -s.size[1] / 2
+    def top(s):
+        return -s.size[1] / 2
     @property
-    def bottom(s): return s.size[1] / 2
+    def bottom(s):
+        return s.size[1] / 2
 
     def __init__(s, objects=[], wall_markers=True):
         s.objects = objects
