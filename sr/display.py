@@ -25,7 +25,6 @@ def get_surface(name):
     return sprites[name]
 
 class Display(object):
-
     def __init__(self, arena):
         self.arena = arena
         arena_w, arena_h = self.arena.size
