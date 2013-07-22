@@ -1,8 +1,6 @@
 import threading
 
 class GameObject(object):
-    arena = None
-
     surface_name = None
     marker_info = None
     grabbable = False
