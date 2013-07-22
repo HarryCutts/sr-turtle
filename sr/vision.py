@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 # From pyenv.git/pylib/sr/vision.py
-MARKER_ARENA, MARKER_ROBOT, MARKER_PEDESTAL, MARKER_TOKEN = range(0,4)
+MARKER_ARENA, MARKER_ROBOT, MARKER_PEDESTAL, MARKER_TOKEN = range(4)
 
 marker_offsets = {
     MARKER_ARENA: 0,
@@ -34,7 +34,7 @@ Point = namedtuple("Point", "polar")
 # Marker class
 MarkerBase = namedtuple( "Marker", "info res centre timestamp" )
 class Marker(MarkerBase):
-    def __init__( self, *a, **kwd ):
+    def __init__(self, *a, **kwd):
         # Aliases
         self.dist = self.centre.polar.length
         self.rot_y = self.centre.polar.rot_y
