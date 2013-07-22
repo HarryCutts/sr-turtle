@@ -1,5 +1,3 @@
-#!/usr/bin/python2.7
-
 from __future__ import division
 from math import degrees
 
