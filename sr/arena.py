@@ -7,6 +7,9 @@ from math import pi
 
 MARKERS_PER_WALL = 7
 
+def lerp(delta, a, b):
+    return delta*b + (1-delta)*a
+
 class Arena(object):
     size = (6, 6)
 
@@ -27,32 +30,29 @@ class Arena(object):
     def bottom(self):
         return self.size[1] / 2
 
+    def _populate_wall(self, left, right, count, start, angle):
+        left_bound_x, left_bound_y = left
+        right_bound_x, right_bound_y = right
+        for i in xrange(count):
+            delta = (i + 1) / (count + 1)
+            x = lerp(delta, left_bound_x, right_bound_x)
+            y = lerp(delta, left_bound_y, right_bound_y)
+            identifier = start + i
+            self.objects.append(WallMarker(self, identifier, (x, y), angle))
+
     def _populate_wall_markers(self):
-        x_interval = self.size[0] / (MARKERS_PER_WALL + 1)
-        y_interval = self.size[1] / (MARKERS_PER_WALL + 1)
         # Left wall
-        y = self.top + y_interval
-        for i in range(0, MARKERS_PER_WALL):
-            self.objects.append(WallMarker(self, i, (self.left, y), 0))
-            y += y_interval
-
-        # Bottom wall
-        x = self.left + x_interval
-        for i in range(MARKERS_PER_WALL, 2*MARKERS_PER_WALL):
-            self.objects.append(WallMarker(self, i, (x, self.bottom), pi / 2))
-            x += x_interval
-
+        self._populate_wall(left = (self.left, self.bottom), right = (self.left, self.top),
+                            count = MARKERS_PER_WALL, start = 0, angle = 0)
         # Right wall
-        y = self.bottom - y_interval
-        for i in range(2*MARKERS_PER_WALL, 3*MARKERS_PER_WALL):
-            self.objects.append(WallMarker(self, i, (self.right, y), pi))
-            y -= y_interval
-
+        self._populate_wall(left = (self.right, self.bottom), right = (self.right, self.top),
+                            count = MARKERS_PER_WALL, start = MARKERS_PER_WALL, angle = pi)
+        # Bottom wall
+        self._populate_wall(left = (self.left, self.bottom), right = (self.right, self.bottom),
+                            count = MARKERS_PER_WALL, start = 2*MARKERS_PER_WALL, angle = pi / 2)
         # Top wall
-        x = self.right - x_interval
-        for i in range(3*MARKERS_PER_WALL, 4*MARKERS_PER_WALL):
-            self.objects.append(WallMarker(self, i, (x, self.top), 3 * pi / 2))
-            x -= x_interval
+        self._populate_wall(left = (self.left, self.top), right = (self.right, self.top),
+                            count = MARKERS_PER_WALL, start = 3*MARKERS_PER_WALL, angle = 3*pi / 2)
 
     def __init__(self, objects=None, wall_markers=True):
         self.objects = objects if objects is not None else []
