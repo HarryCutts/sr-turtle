@@ -12,5 +12,5 @@ class GameObject(object):
 
     lock = threading.RLock()
 
-    def __init__(s, arena):
-        s.arena = arena
+    def __init__(self, arena):
+        self.arena = arena
