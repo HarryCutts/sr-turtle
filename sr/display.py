@@ -41,6 +41,7 @@ class Display(object):
         pygame.display.quit()
 
     def _draw_background(self):
+        # TODO: break this method up
         self._background = pygame.Surface(self.size)
         self._background.fill(ARENA_FLOOR_COLOR)
         a = self.arena
