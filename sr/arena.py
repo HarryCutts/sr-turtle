@@ -8,7 +8,6 @@ from math import pi
 MARKERS_PER_WALL = 7
 
 class Arena(object):
-
     size = (6, 6)
 
     zone_size = 1
