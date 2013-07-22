@@ -5,11 +5,11 @@ class GameObject(object):
     marker_info = None
     grabbable = False
 
-    location = (0, 0)
-    heading = 0
-
     def __init__(self, arena):
         self.arena = arena
+
+        self.location = (0, 0)
+        self.heading = 0
 
         self.lock = threading.RLock()
 
