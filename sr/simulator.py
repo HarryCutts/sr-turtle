@@ -8,31 +8,29 @@ from display import Display
 from markers import Token
 
 class Simulator(object):
-    def __init__(s, num_tokens=5, size=(8, 8), frames_per_second=30):
-        s.arena = Arena()
+    def __init__(self, num_tokens=5, size=(8, 8), frames_per_second=30):
+        self.arena = Arena()
 
         for i in range(num_tokens):
-            token = Token(s.arena, i)
+            token = Token(self.arena, i)
             token.location = (random() * 4 - 2, random() * 4 - 2)
-            s.arena.objects.append(token)
+            self.arena.objects.append(token)
 
-        s.display = Display(s.arena)
+        self.display = Display(self.arena)
 
-        s._loop_thread = threading.Thread(target=s._main_loop, args=(frames_per_second,))
-        s._loop_thread.start()
+        self._loop_thread = threading.Thread(target=self._main_loop, args=(frames_per_second,))
+        self._loop_thread.start()
 
-    def _main_loop(s, frames_per_second):
+    def _main_loop(self, frames_per_second):
         clock = pygame.time.Clock()
 
-        done = False
-
-        while done == False:
+        while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    done = True
+                    return
 
-            s.display.tick(1/frames_per_second)
+            self.display.tick(1/frames_per_second)
             clock.tick(frames_per_second)
 
-    def __del__(s):
+    def __del__(self):
         pygame.quit()
