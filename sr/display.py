@@ -19,7 +19,7 @@ def to_pixel_coord(world_coord, arena):
 sprites = {}
 
 def get_surface(name):
-    if not name in sprites:
+    if name not in sprites:
         sprites[name] = pygame.image.load(name).convert_alpha()
 
     return sprites[name]
