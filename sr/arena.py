@@ -27,34 +27,37 @@ class Arena(object):
     def bottom(self):
         return self.size[1] / 2
 
+    def _populate_wall_markers(self):
+        x_interval = self.size[0] / (MARKERS_PER_WALL + 1)
+        y_interval = self.size[1] / (MARKERS_PER_WALL + 1)
+        # Left wall
+        y = self.top + y_interval
+        for i in range(0, MARKERS_PER_WALL):
+            self.objects.append(WallMarker(self, i, (self.left, y), 0))
+            y += y_interval
+
+        # Bottom wall
+        x = self.left + x_interval
+        for i in range(MARKERS_PER_WALL, 2*MARKERS_PER_WALL):
+            self.objects.append(WallMarker(self, i, (x, self.bottom), pi / 2))
+            x += x_interval
+
+        # Right wall
+        y = self.bottom - y_interval
+        for i in range(2*MARKERS_PER_WALL, 3*MARKERS_PER_WALL):
+            self.objects.append(WallMarker(self, i, (self.right, y), pi))
+            y -= y_interval
+
+        # Top wall
+        x = self.right - x_interval
+        for i in range(3*MARKERS_PER_WALL, 4*MARKERS_PER_WALL):
+            self.objects.append(WallMarker(self, i, (x, self.top), 3 * pi / 2))
+            x -= x_interval
+
     def __init__(self, objects=None, wall_markers=True):
         self.objects = objects if objects is not None else []
         if wall_markers:
-            x_interval = self.size[0] / (MARKERS_PER_WALL + 1)
-            y_interval = self.size[1] / (MARKERS_PER_WALL + 1)
-            # Left wall
-            y = self.top + y_interval
-            for i in range(0, MARKERS_PER_WALL):
-                self.objects.append(WallMarker(self, i, (self.left, y), 0))
-                y += y_interval
-
-            # Bottom wall
-            x = self.left + x_interval
-            for i in range(MARKERS_PER_WALL, 2*MARKERS_PER_WALL):
-                self.objects.append(WallMarker(self, i, (x, self.bottom), pi / 2))
-                x += x_interval
-
-            # Right wall
-            y = self.bottom - y_interval
-            for i in range(2*MARKERS_PER_WALL, 3*MARKERS_PER_WALL):
-                self.objects.append(WallMarker(self, i, (self.right, y), pi))
-                y -= y_interval
-
-            # Top wall
-            x = self.right - x_interval
-            for i in range(3*MARKERS_PER_WALL, 4*MARKERS_PER_WALL):
-                self.objects.append(WallMarker(self, i, (x, self.top), 3 * pi / 2))
-                x -= x_interval
+            self._populate_wall_markers()
 
     ## Public Methods ##
 
