@@ -75,7 +75,7 @@ class Display(object):
         self._screen.blit(self._background, (0, 0))
 
         for obj in self.arena.objects:
-            if obj.surface_name != None:
+            if obj.surface_name is not None:
                 with obj.lock:
                     surface = get_surface(obj.surface_name)
                     surface = pygame.transform.rotate(surface, -degrees(obj.heading))
