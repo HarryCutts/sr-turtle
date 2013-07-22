@@ -27,8 +27,8 @@ class Arena(object):
     def bottom(self):
         return self.size[1] / 2
 
-    def __init__(s, objects=[], wall_markers=True):
-        s.objects = objects
+    def __init__(s, objects=None, wall_markers=True):
+        s.objects = objects if objects is not None else []
         if wall_markers:
             x_interval = s.size[0] / (MARKERS_PER_WALL + 1)
             y_interval = s.size[1] / (MARKERS_PER_WALL + 1)
