@@ -77,12 +77,13 @@ class Display(object):
             if obj.surface_name is None:
                 continue
             with obj.lock:
-                surface = get_surface(obj.surface_name)
-                surface = pygame.transform.rotate(surface, -degrees(obj.heading))
-                object_width, object_height = surface.get_size()
+                heading = -degrees(obj.heading)
                 x, y = to_pixel_coord(obj.location, self.arena)
-                screen_location = (x - object_width / 2, y - object_height / 2)
-                self._screen.blit(surface, screen_location)
+            surface = get_surface(obj.surface_name)
+            surface = pygame.transform.rotate(surface, heading)
+            object_width, object_height = surface.get_size()
+            screen_location = (x - object_width / 2, y - object_height / 2)
+            self._screen.blit(surface, screen_location)
 
         pygame.display.flip()
 
