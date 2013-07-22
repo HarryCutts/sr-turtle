@@ -67,6 +67,6 @@ class Arena(object):
             return True, None, None
 
     def tick(self, time_passed):
-        for o in self.objects:
-            if hasattr(o, "tick"):
-                o.tick(time_passed)
+        for obj in self.objects:
+            if hasattr(obj, "tick"):
+                obj.tick(time_passed)
