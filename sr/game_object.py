@@ -1,16 +1,15 @@
 import threading
 
 class GameObject(object):
-    arena = None
-
     surface_name = None
     marker_info = None
     grabbable = False
 
-    location = (0, 0)
-    heading = 0
+    def __init__(self, arena):
+        self.arena = arena
 
-    lock = threading.RLock()
+        self.location = (0, 0)
+        self.heading = 0
 
-    def __init__(s, arena):
-        s.arena = arena
+        self.lock = threading.RLock()
+

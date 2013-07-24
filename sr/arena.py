@@ -7,8 +7,10 @@ from math import pi
 
 MARKERS_PER_WALL = 7
 
-class Arena(object):
+def lerp(delta, a, b):
+    return delta*b + (1-delta)*a
 
+class Arena(object):
     size = (6, 6)
 
     zone_size = 1
@@ -16,55 +18,58 @@ class Arena(object):
     motif_name = 'sr/sr_round_flat.png'
 
     @property
-    def left(s):   return -s.size[0] / 2
+    def left(self):
+        return -self.size[0] / 2
     @property
-    def right(s):  return s.size[0] / 2
+    def right(self):
+        return self.size[0] / 2
     @property
-    def top(s):    return -s.size[1] / 2
+    def top(self):
+        return -self.size[1] / 2
     @property
-    def bottom(s): return s.size[1] / 2
+    def bottom(self):
+        return self.size[1] / 2
 
-    def __init__(s, objects=[], wall_markers=True):
-        s.objects = objects
+    def _populate_wall(self, left, right, count, start, angle):
+        left_bound_x, left_bound_y = left
+        right_bound_x, right_bound_y = right
+        for i in xrange(count):
+            delta = (i + 1) / (count + 1)
+            x = lerp(delta, left_bound_x, right_bound_x)
+            y = lerp(delta, left_bound_y, right_bound_y)
+            identifier = start + i
+            self.objects.append(WallMarker(self, identifier, (x, y), angle))
+
+    def _populate_wall_markers(self):
+        # Left wall
+        self._populate_wall(left = (self.left, self.bottom), right = (self.left, self.top),
+                            count = MARKERS_PER_WALL, start = 0, angle = 0)
+        # Right wall
+        self._populate_wall(left = (self.right, self.bottom), right = (self.right, self.top),
+                            count = MARKERS_PER_WALL, start = MARKERS_PER_WALL, angle = pi)
+        # Bottom wall
+        self._populate_wall(left = (self.left, self.bottom), right = (self.right, self.bottom),
+                            count = MARKERS_PER_WALL, start = 2*MARKERS_PER_WALL, angle = pi / 2)
+        # Top wall
+        self._populate_wall(left = (self.left, self.top), right = (self.right, self.top),
+                            count = MARKERS_PER_WALL, start = 3*MARKERS_PER_WALL, angle = 3*pi / 2)
+
+    def __init__(self, objects=None, wall_markers=True):
+        self.objects = objects if objects is not None else []
         if wall_markers:
-            x_interval = s.size[0] / (MARKERS_PER_WALL + 1)
-            y_interval = s.size[1] / (MARKERS_PER_WALL + 1)
-            # Left wall
-            y = s.top + y_interval
-            for i in range(0, MARKERS_PER_WALL):
-                s.objects.append(WallMarker(s, i, (s.left, y), 0))
-                y += y_interval
-
-            # Bottom wall
-            x = s.left + x_interval
-            for i in range(MARKERS_PER_WALL, 2*MARKERS_PER_WALL):
-                s.objects.append(WallMarker(s, i, (x, s.bottom), pi / 2))
-                x += x_interval
-
-            # Right wall
-            y = s.bottom - y_interval
-            for i in range(2*MARKERS_PER_WALL, 3*MARKERS_PER_WALL):
-                s.objects.append(WallMarker(s, i, (s.right, y), pi))
-                y -= y_interval
-
-            # Top wall
-            x = s.right - x_interval
-            for i in range(3*MARKERS_PER_WALL, 4*MARKERS_PER_WALL):
-                s.objects.append(WallMarker(s, i, (x, s.top), 3 * pi / 2))
-                x -= x_interval
+            self._populate_wall_markers()
 
     ## Public Methods ##
 
-    def contains_point(s, point):
-        x, y = point
-        if not (s.left < x < s.right):
-            return False, 0, max(s.left, min(x, s.right))
-        elif not (s.top < y < s.bottom):
-            return False, 1, max(s.top, min(y, s.bottom))
+    def contains_point(self, (x, y)):
+        if not (self.left < x < self.right):
+            return False, 0, max(self.left, min(x, self.right))
+        elif not (self.top < y < self.bottom):
+            return False, 1, max(self.top, min(y, self.bottom))
         else:
             return True, None, None
 
-    def tick(s, time_passed):
-        for o in s.objects:
-            if hasattr(o, "tick"):
-                o.tick(time_passed)
+    def tick(self, time_passed):
+        for obj in self.objects:
+            if hasattr(obj, "tick"):
+                obj.tick(time_passed)
