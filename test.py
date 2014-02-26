@@ -11,19 +11,19 @@ token_filter = lambda m: m.info.marker_type == MARKER_TOKEN
 
 def drive(speed, seconds):
     global R
-    R.motors[0].target = speed
-    R.motors[1].target = speed
+    R.motors[0].m0.power = speed
+    R.motors[0].m1.power = speed
     time.sleep(seconds)
-    R.motors[0].target = 0
-    R.motors[1].target = 0
+    R.motors[0].m0.power = 0
+    R.motors[0].m1.power = 0
 
 def turn(speed, seconds):
     global R
-    R.motors[0].target = speed
-    R.motors[1].target = -speed
+    R.motors[0].m0.power = speed
+    R.motors[0].m1.power = -speed
     time.sleep(seconds)
-    R.motors[0].target = 0
-    R.motors[1].target = 0
+    R.motors[0].m0.power = 0
+    R.motors[0].m1.power = 0
 
 state = SEARCHING
 

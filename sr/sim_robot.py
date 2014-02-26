@@ -22,28 +22,37 @@ class AlreadyHoldingSomethingException(exceptions.Exception):
     def __str__(self):
         return "The robot is already holding something."
 
-class Motor(object):
-    _target = 0
+class MotorChannel(object):
+    def __init__(self, robot):
+        self._power = 0
+        self._robot = robot
+
+    @property
+    def power(self):
+        return self._power
+
+    @power.setter
+    def power(self, value):
+        value = min(max(value, -MAX_MOTOR_SPEED), MAX_MOTOR_SPEED)
+        with self._robot.lock:
+            self._power = value
+
+class Motor:
+    """Represents a motor board."""
+    # This is named `Motor` instead of `MotorBoard` for consistency with pyenv
+
+    # TODO: add a dummy serial number
 
     def __init__(self, robot):
         self._robot = robot
 
-    @property
-    def target(self):
-        return self._target
-
-    @target.setter
-    def target(self, value):
-        value = min(max(value, -MAX_MOTOR_SPEED), MAX_MOTOR_SPEED)
-        with self._robot.lock:
-            self._target = value
+        self.m0 = MotorChannel(robot)
+        self.m1 = MotorChannel(robot)
 
 class SimRobot(GameObject):
     width = 0.48
 
     surface_name = 'sr/robot.png'
-
-    motors = None
 
     _holding = None
 
@@ -51,7 +60,7 @@ class SimRobot(GameObject):
 
     def __init__(self, simulator):
         GameObject.__init__(self, simulator.arena)
-        self.motors = [Motor(self), Motor(self)]
+        self.motors = [Motor(self)]
         self.corners = self._calculate_corners(self.location, self.heading)
         simulator.arena.objects.append(self)
 
@@ -69,7 +78,7 @@ class SimRobot(GameObject):
         return corners
 
     def _calculate_movement(self, t):
-        sl, sr = self.motors[0].target * SPEED_SCALE_FACTOR, self.motors[1].target * SPEED_SCALE_FACTOR
+        sl, sr = self.motors[0].m0.power * SPEED_SCALE_FACTOR, self.motors[0].m1.power * SPEED_SCALE_FACTOR
         w = self.width
 
         # To be calculated
