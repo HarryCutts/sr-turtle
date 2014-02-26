@@ -41,13 +41,16 @@ class Motor:
     """Represents a motor board."""
     # This is named `Motor` instead of `MotorBoard` for consistency with pyenv
 
-    # TODO: add a dummy serial number
-
     def __init__(self, robot):
         self._robot = robot
+        self.serialnum = "SIM_MBv4"
 
         self.m0 = MotorChannel(robot)
         self.m1 = MotorChannel(robot)
+
+    def __repr__(self):
+        return "Motor( serialnum = \"{0}\" ) (Simulated Motor Board v4)" \
+               .format(self.serialnum)
 
 class SimRobot(GameObject):
     width = 0.48
