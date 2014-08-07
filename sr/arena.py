@@ -7,6 +7,8 @@ from random import random
 from display import get_surface, PIXELS_PER_METER
 from markers import WallMarker, Token
 
+import pypybox2d
+
 MARKERS_PER_WALL = 7
 
 ARENA_FLOOR_COLOR = (0x11, 0x18, 0x33)
@@ -61,6 +63,7 @@ class Arena(object):
                             count = MARKERS_PER_WALL, start = 3*MARKERS_PER_WALL, angle = 3*pi / 2)
 
     def __init__(self, objects=None, wall_markers=True, num_tokens=5):
+        self._physics_world = pypybox2d.world.World(gravity=(0, 0))
         self.objects = objects if objects is not None else []
         if wall_markers:
             self._populate_wall_markers()
@@ -81,6 +84,9 @@ class Arena(object):
             return True, None, None
 
     def tick(self, time_passed):
+        self._physics_world.step(time_passed,
+                                 vel_iters=12,
+                                 pos_iters=12)
         for obj in self.objects:
             if hasattr(obj, "tick"):
                 obj.tick(time_passed)
