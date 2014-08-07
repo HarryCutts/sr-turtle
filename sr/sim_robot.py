@@ -205,11 +205,26 @@ class SimRobot(GameObject):
 
         acq_time = time.time()
 
+        MOTION_BLUR_POWER_THRESHOLD = 5
+
+        def robot_moving(o):
+            return any(abs(board.m0.power) > MOTION_BLUR_POWER_THRESHOLD or
+                       abs(board.m1.power) > MOTION_BLUR_POWER_THRESHOLD
+                        for board in o.motors)
+
+        def motion_blurred(o):
+            # Simple approximation: we can't see anything if either it's moving
+            # or we're moving. This doesn't handle tokens grabbed by other robots
+            # but Sod's Law says we're likely to see those anyway.
+            return (robot_moving(self) or
+                    isinstance(o, SimRobot) and robot_moving(o))
+
         def object_filter(o):
             # Choose only marked objects within the field of view
             direction = atan2(o.location[1] - y, o.location[0] - x)
-            return o.marker_info != None \
-                   and -HALF_FOV_WIDTH < direction - heading < HALF_FOV_WIDTH
+            return (o.marker_info != None and
+                    -HALF_FOV_WIDTH < direction - heading < HALF_FOV_WIDTH and
+                    not motion_blurred(o))
 
         def marker_map(o):
             # Turn a marked object into a Marker
