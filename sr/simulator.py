@@ -12,6 +12,7 @@ class Simulator(object):
         self.display = Display(self.arena)
 
         self._loop_thread = threading.Thread(target=self._main_loop, args=(frames_per_second,))
+        self._loop_thread.setDaemon(True)
         self._loop_thread.start()
 
     def _main_loop(self, frames_per_second):
