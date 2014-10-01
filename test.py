@@ -10,7 +10,6 @@ R = SimRobot(sim)
 token_filter = lambda m: m.info.marker_type == MARKER_TOKEN
 
 def drive(speed, seconds):
-    global R
     R.motors[0].m0.power = speed
     R.motors[0].m1.power = speed
     time.sleep(seconds)
@@ -18,7 +17,6 @@ def drive(speed, seconds):
     R.motors[0].m1.power = 0
 
 def turn(speed, seconds):
-    global R
     R.motors[0].m0.power = speed
     R.motors[0].m1.power = -speed
     time.sleep(seconds)
