@@ -28,6 +28,8 @@ class Simulator(object):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    return
 
             self.display.tick(1/frames_per_second)
             clock.tick(frames_per_second)
