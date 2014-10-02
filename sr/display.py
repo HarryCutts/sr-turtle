@@ -5,17 +5,6 @@ import pygame
 
 PIXELS_PER_METER = 100
 
-ARENA_FLOOR_COLOR = (0x11, 0x18, 0x33)
-ARENA_MARKINGS_COLOR = (0xD0, 0xD0, 0xD0)
-ARENA_MARKINGS_WIDTH = 2
-
-def to_pixel_coord(world_coord, arena):
-    offset_x = arena.size[0] / 2
-    offset_y = arena.size[1] / 2
-    x, y = world_coord
-    x, y = ((x + offset_x) * PIXELS_PER_METER, (y + offset_y) * PIXELS_PER_METER)
-    return (x, y)
-
 sprites = {}
 
 def get_surface(name):
@@ -41,35 +30,8 @@ class Display(object):
         pygame.display.quit()
 
     def _draw_background(self):
-        # TODO: break this method up
         self._background = pygame.Surface(self.size)
-        self._background.fill(ARENA_FLOOR_COLOR)
-        a = self.arena
-        # Corners of the inside square
-        top_left     = to_pixel_coord((a.left + a.zone_size, a.top + a.zone_size), a)
-        top_right    = to_pixel_coord((a.right - a.zone_size, a.top + a.zone_size), a)
-        bottom_right = to_pixel_coord((a.right - a.zone_size, a.bottom - a.zone_size), a)
-        bottom_left  = to_pixel_coord((a.left + a.zone_size, a.bottom - a.zone_size), a)
-
-        # Lines separating zones
-        def line(start, end):
-            pygame.draw.line(self._background, ARENA_MARKINGS_COLOR, \
-                             start, end, ARENA_MARKINGS_WIDTH)
-
-        line((0, 0), top_left)
-        line((self.size[0], 0), top_right)
-        line(self.size, bottom_right)
-        line((0, self.size[1]), bottom_left)
-
-        # Square separating zones from centre
-        pygame.draw.polygon(self._background, ARENA_MARKINGS_COLOR, \
-                            [top_left, top_right, bottom_right, bottom_left], 2)
-
-        # Motif
-        motif = get_surface(a.motif_name)
-        x, y = to_pixel_coord((0, 0), self.arena)
-        w, h = motif.get_size()
-        self._background.blit(motif, (x - w / 2, y - h / 2))
+        self.arena.draw_background(self._background, self)
 
     def _draw(self):
         self._screen.blit(self._background, (0, 0))
@@ -79,7 +41,7 @@ class Display(object):
                 continue
             with obj.lock:
                 heading = -degrees(obj.heading)
-                x, y = to_pixel_coord(obj.location, self.arena)
+                x, y = self.to_pixel_coord(obj.location)
             surface = get_surface(obj.surface_name)
             surface = pygame.transform.rotate(surface, heading)
             object_width, object_height = surface.get_size()
@@ -94,3 +56,12 @@ class Display(object):
         self.arena.tick(time_passed)
         # TODO: Allow multiple displays on one arena without them all ticking it
         self._draw()
+
+    def to_pixel_coord(self, world_coord, arena=None):
+        if arena is None: arena = self.arena
+        offset_x = arena.size[0] / 2
+        offset_y = arena.size[1] / 2
+        x, y = world_coord
+        x, y = ((x + offset_x) * PIXELS_PER_METER, (y + offset_y) * PIXELS_PER_METER)
+        return (x, y)
+

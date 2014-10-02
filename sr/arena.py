@@ -1,11 +1,16 @@
 from __future__ import division
 
 import pygame
-
-from markers import WallMarker
 from math import pi
 
+from display import get_surface, PIXELS_PER_METER
+from markers import WallMarker
+
 MARKERS_PER_WALL = 7
+
+ARENA_FLOOR_COLOR = (0x11, 0x18, 0x33)
+ARENA_MARKINGS_COLOR = (0xD0, 0xD0, 0xD0)
+ARENA_MARKINGS_WIDTH = 2
 
 def lerp(delta, a, b):
     return delta*b + (1-delta)*a
@@ -73,3 +78,32 @@ class Arena(object):
         for obj in self.objects:
             if hasattr(obj, "tick"):
                 obj.tick(time_passed)
+
+    def draw_background(self, surface, display):
+        surface.fill(ARENA_FLOOR_COLOR)
+
+        # Corners of the inside square
+        top_left     = display.to_pixel_coord((self.left + self.zone_size, self.top + self.zone_size), self)
+        top_right    = display.to_pixel_coord((self.right - self.zone_size, self.top + self.zone_size), self)
+        bottom_right = display.to_pixel_coord((self.right - self.zone_size, self.bottom - self.zone_size), self)
+        bottom_left  = display.to_pixel_coord((self.left + self.zone_size, self.bottom - self.zone_size), self)
+
+        # Lines separating zones
+        def line(start, end):
+            pygame.draw.line(surface, ARENA_MARKINGS_COLOR, \
+                             start, end, ARENA_MARKINGS_WIDTH)
+
+        line((0, 0), top_left)
+        line((display.size[0], 0), top_right)
+        line(display.size, bottom_right)
+        line((0, display.size[1]), bottom_left)
+
+        # Square separating zones from centre
+        pygame.draw.polygon(surface, ARENA_MARKINGS_COLOR, \
+                            [top_left, top_right, bottom_right, bottom_left], 2)
+
+        # Motif
+        motif = get_surface(self.motif_name)
+        x, y = display.to_pixel_coord((0, 0), self)
+        w, h = motif.get_size()
+        surface.blit(motif, (x - w / 2, y - h / 2))
