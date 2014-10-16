@@ -1,20 +1,13 @@
 from __future__ import division
 
 import threading, time, pygame
-from random import random
 
 from arena import Arena
 from display import Display
-from markers import Token
 
 class Simulator(object):
     def __init__(self, num_tokens=5, size=(8, 8), frames_per_second=30):
-        self.arena = Arena()
-
-        for i in range(num_tokens):
-            token = Token(self.arena, i)
-            token.location = (random() * 4 - 2, random() * 4 - 2)
-            self.arena.objects.append(token)
+        self.arena = Arena(num_tokens=num_tokens)
 
         self.display = Display(self.arena)
 

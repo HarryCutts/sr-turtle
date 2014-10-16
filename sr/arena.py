@@ -2,9 +2,10 @@ from __future__ import division
 
 import pygame
 from math import pi
+from random import random
 
 from display import get_surface, PIXELS_PER_METER
-from markers import WallMarker
+from markers import WallMarker, Token
 
 MARKERS_PER_WALL = 7
 
@@ -59,10 +60,15 @@ class Arena(object):
         self._populate_wall(left = (self.left, self.top), right = (self.right, self.top),
                             count = MARKERS_PER_WALL, start = 3*MARKERS_PER_WALL, angle = 3*pi / 2)
 
-    def __init__(self, objects=None, wall_markers=True):
+    def __init__(self, objects=None, wall_markers=True, num_tokens=5):
         self.objects = objects if objects is not None else []
         if wall_markers:
             self._populate_wall_markers()
+
+        for i in range(num_tokens):
+            token = Token(self, i)
+            token.location = (random() * 4 - 2, random() * 4 - 2)
+            self.objects.append(token)
 
     ## Public Methods ##
 
