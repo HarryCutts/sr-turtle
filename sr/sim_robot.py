@@ -94,8 +94,8 @@ class SimRobot(GameObject):
         half_width = self.width * 0.5
         self._body = make_body(position=(0, 0),
                                angle=0,
-                               linear_damping=0.2,
-                               angular_damping=0.2,
+                               linear_damping=0.0,
+                               angular_damping=0.0,
                                type=pypybox2d.body.Body.DYNAMIC)
         self._body.create_polygon_fixture([(-half_width, -half_width),
                                            ( half_width, -half_width),
@@ -107,10 +107,12 @@ class SimRobot(GameObject):
     ## Internal methods ##
 
     def _apply_wheel_force(self, y_position, power):
-        if power == 0:
-            return
         location_world_space = self._body.get_world_point((0, y_position))
-        force_magnitude = power * 0.4
+        force_magnitude = power * 0.6
+        # account for friction
+        frict_world = self._body.get_linear_velocity_from_local_point((0, y_position))
+        frict_x, frict_y = self._body.get_local_vector(frict_world)
+        force_magnitude -= frict_x * 50.2
         force_world_space = (force_magnitude * cos(self.heading),
                              force_magnitude * sin(self.heading))
         self._body.apply_force(force_world_space, location_world_space)
@@ -125,7 +127,7 @@ class SimRobot(GameObject):
             # right wheel
             self._apply_wheel_force( half_width, self.motors[0].m1.power)
             # kill the lateral velocity
-            right_normal = self._body.get_world_vector((1, 0))
+            right_normal = self._body.get_world_vector((0, 1))
             lateral_vel = (right_normal.dot(self._body.linear_velocity) *
                            right_normal)
             impulse = self._body.mass * -lateral_vel
