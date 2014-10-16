@@ -4,8 +4,8 @@ import pygame
 from math import pi
 from random import random
 
-from display import get_surface, PIXELS_PER_METER
-from markers import WallMarker, Token
+from ..display import get_surface, PIXELS_PER_METER
+from ..markers import WallMarker, Token
 
 MARKERS_PER_WALL = 7
 
@@ -60,15 +60,10 @@ class Arena(object):
         self._populate_wall(left = (self.left, self.top), right = (self.right, self.top),
                             count = MARKERS_PER_WALL, start = 3*MARKERS_PER_WALL, angle = 3*pi / 2)
 
-    def __init__(self, objects=None, wall_markers=True, num_tokens=5):
+    def __init__(self, objects=None, wall_markers=True):
         self.objects = objects if objects is not None else []
         if wall_markers:
             self._populate_wall_markers()
-
-        for i in range(num_tokens):
-            token = Token(self, i)
-            token.location = (random() * 4 - 2, random() * 4 - 2)
-            self.objects.append(token)
 
     ## Public Methods ##
 
@@ -87,26 +82,6 @@ class Arena(object):
 
     def draw_background(self, surface, display):
         surface.fill(ARENA_FLOOR_COLOR)
-
-        # Corners of the inside square
-        top_left     = display.to_pixel_coord((self.left + self.zone_size, self.top + self.zone_size), self)
-        top_right    = display.to_pixel_coord((self.right - self.zone_size, self.top + self.zone_size), self)
-        bottom_right = display.to_pixel_coord((self.right - self.zone_size, self.bottom - self.zone_size), self)
-        bottom_left  = display.to_pixel_coord((self.left + self.zone_size, self.bottom - self.zone_size), self)
-
-        # Lines separating zones
-        def line(start, end):
-            pygame.draw.line(surface, ARENA_MARKINGS_COLOR, \
-                             start, end, ARENA_MARKINGS_WIDTH)
-
-        line((0, 0), top_left)
-        line((display.size[0], 0), top_right)
-        line(display.size, bottom_right)
-        line((0, display.size[1]), bottom_left)
-
-        # Square separating zones from centre
-        pygame.draw.polygon(surface, ARENA_MARKINGS_COLOR, \
-                            [top_left, top_right, bottom_right, bottom_left], 2)
 
         # Motif
         motif = get_surface(self.motif_name)

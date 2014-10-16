@@ -2,12 +2,12 @@ from __future__ import division
 
 import threading, time, pygame
 
-from arena import Arena
+from arenas import PiratePlunderArena
 from display import Display
 
 class Simulator(object):
     def __init__(self, num_tokens=5, size=(8, 8), frames_per_second=30):
-        self.arena = Arena(num_tokens=num_tokens)
+        self.arena = PiratePlunderArena(num_tokens=num_tokens)
 
         self.display = Display(self.arena)
 
