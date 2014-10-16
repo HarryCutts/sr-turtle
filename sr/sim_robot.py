@@ -69,10 +69,9 @@ class SimRobot(GameObject):
 
     @location.setter
     def location(self, new_pos):
-        print "Warning: trying to set location to {}".format(new_pos)
         if self._body is None:
             return # Slight hack: deal with the initial setting from the constructor
-        #self._body.world_center = new_pos
+        self._body.world_center = new_pos
 
     @property
     def heading(self):
@@ -80,7 +79,6 @@ class SimRobot(GameObject):
 
     @heading.setter
     def heading(self, _new_heading):
-        print "Warning: trying to set heading to {}".format(_new_heading)
         if self._body is None:
             return # Slight hack: deal with the initial setting from the constructor
         self._body.angle = _new_heading
