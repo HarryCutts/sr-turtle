@@ -71,7 +71,7 @@ class SimRobot(GameObject):
     def location(self, new_pos):
         if self._body is None:
             return # Slight hack: deal with the initial setting from the constructor
-        self._body.world_center = new_pos
+        #self._body.world_center = new_pos
 
     @property
     def heading(self):
@@ -150,9 +150,13 @@ class SimRobot(GameObject):
         objects = filter(object_filter, self.arena.objects)
         if objects:
             self._holding = objects[0]
+            if hasattr(self._holding, '_body'):
+                with self.lock:
+                    self._holding_joint = self._body._world.create_weld_joint(self._body,
+                                                                              self._holding._body,
+                                                                              local_anchor_a=(GRABBER_OFFSET, 0),
+                                                                              local_anchor_b=(0, 0))
             self._holding.grab()
-            self._holding.location = (x + cos(heading) * GRABBER_OFFSET, \
-                                      y + sin(heading) * GRABBER_OFFSET)
             return True
         else:
             return False
@@ -160,6 +164,10 @@ class SimRobot(GameObject):
     def release(self):
         if self._holding is not None:
             self._holding.release()
+            if hasattr(self._holding, '_body'):
+                with self.lock:
+                    self._body.world.destroy_joint(self._holding_joint)
+                self._holding_joint = None
             self._holding = None
             return True
         else:
