@@ -19,7 +19,7 @@ def lerp(delta, a, b):
     return delta*b + (1-delta)*a
 
 class Arena(object):
-    size = (6, 6)
+    size = (8, 8)
 
     zone_size = 1
 
