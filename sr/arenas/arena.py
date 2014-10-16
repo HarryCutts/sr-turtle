@@ -7,6 +7,8 @@ from random import random
 from ..display import get_surface, PIXELS_PER_METER
 from ..markers import WallMarker, Token
 
+import pypybox2d
+
 MARKERS_PER_WALL = 7
 
 ARENA_FLOOR_COLOR = (0x11, 0x18, 0x33)
@@ -17,7 +19,7 @@ def lerp(delta, a, b):
     return delta*b + (1-delta)*a
 
 class Arena(object):
-    size = (6, 6)
+    size = (8, 8)
 
     zone_size = 1
 
@@ -60,7 +62,41 @@ class Arena(object):
         self._populate_wall(left = (self.left, self.top), right = (self.right, self.top),
                             count = MARKERS_PER_WALL, start = 3*MARKERS_PER_WALL, angle = 3*pi / 2)
 
+    def _init_physics(self):
+        self._physics_world = pypybox2d.world.World(gravity=(0, 0))
+        # Create the arena wall
+        WALL_WIDTH = 2
+
+        wall_right = self._physics_world.create_body(position=(self.right, 0),
+                                                     type=pypybox2d.body.Body.STATIC)
+        wall_right.create_polygon_fixture([(WALL_WIDTH, self.top - WALL_WIDTH),
+                                           (WALL_WIDTH, self.bottom + WALL_WIDTH),
+                                           (0, self.bottom + WALL_WIDTH),
+                                           (0, self.top - WALL_WIDTH)])
+
+        wall_left = self._physics_world.create_body(position=(self.left, 0),
+                                                    type=pypybox2d.body.Body.STATIC)
+        wall_left.create_polygon_fixture([(-WALL_WIDTH, self.top - WALL_WIDTH),
+                                          (0, self.top - WALL_WIDTH),
+                                          (0, self.bottom + WALL_WIDTH),
+                                          (-WALL_WIDTH, self.bottom + WALL_WIDTH)])
+
+        wall_top = self._physics_world.create_body(position=(0, self.top),
+                                                   type=pypybox2d.body.Body.STATIC)
+        wall_top.create_polygon_fixture([(self.left, 0),
+                                         (self.left, -WALL_WIDTH),
+                                         (self.right, -WALL_WIDTH),
+                                         (self.right, 0)])
+
+        wall_bottom = self._physics_world.create_body(position=(0, self.bottom),
+                                                   type=pypybox2d.body.Body.STATIC)
+        wall_bottom.create_polygon_fixture([(self.left, 0),
+                                            (self.right, 0),
+                                            (self.right, WALL_WIDTH),
+                                            (self.left, WALL_WIDTH)])
+
     def __init__(self, objects=None, wall_markers=True):
+        self._init_physics()
         self.objects = objects if objects is not None else []
         if wall_markers:
             self._populate_wall_markers()
@@ -76,6 +112,9 @@ class Arena(object):
             return True, None, None
 
     def tick(self, time_passed):
+        self._physics_world.step(time_passed,
+                                 vel_iters=12,
+                                 pos_iters=12)
         for obj in self.objects:
             if hasattr(obj, "tick"):
                 obj.tick(time_passed)

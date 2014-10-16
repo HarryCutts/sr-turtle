@@ -9,6 +9,8 @@ from math import pi, sin, cos, degrees, hypot, atan2
 from game_object import GameObject
 from vision import Marker, Point, PolarCoord
 
+import pypybox2d
+
 SPEED_SCALE_FACTOR = 0.02
 MAX_MOTOR_SPEED = 100
 
@@ -61,108 +63,73 @@ class SimRobot(GameObject):
 
     ## Constructor ##
 
+    @property
+    def location(self):
+        return self._body.world_center
+
+    @location.setter
+    def location(self, new_pos):
+        if self._body is None:
+            return # Slight hack: deal with the initial setting from the constructor
+        #self._body.world_center = new_pos
+
+    @property
+    def heading(self):
+        return self._body.angle
+
+    @heading.setter
+    def heading(self, _new_heading):
+        if self._body is None:
+            return # Slight hack: deal with the initial setting from the constructor
+        self._body.angle = _new_heading
+
     def __init__(self, simulator):
+        self._body = None
         GameObject.__init__(self, simulator.arena)
         self.motors = [Motor(self)]
-        self.corners = self._calculate_corners(self.location, self.heading)
         simulator.arena.objects.append(self)
+        make_body = simulator.arena._physics_world.create_body
+        half_width = self.width * 0.5
+        self._body = make_body(position=(0, 0),
+                               angle=0,
+                               linear_damping=0.0,
+                               angular_damping=0.0,
+                               type=pypybox2d.body.Body.DYNAMIC)
+        self._body.create_polygon_fixture([(-half_width, -half_width),
+                                           ( half_width, -half_width),
+                                           ( half_width,  half_width),
+                                           (-half_width,  half_width)],
+                                          density=500*0.12) # MDF @ 12cm thickness
+
 
     ## Internal methods ##
 
-    def _calculate_corners(self, location, heading):
-        corners = []
-        r = hypot(self.width / 2, self.width / 2)
-        x, y = location
-        angle = pi / 4
-        while angle < 2 * pi:
-            corners.append((x + r * cos(heading + angle), y + r * sin(heading + angle)))
-            angle += pi / 2
-
-        return corners
-
-    def _calculate_movement(self, t):
-        sl, sr = self.motors[0].m0.power * SPEED_SCALE_FACTOR, self.motors[0].m1.power * SPEED_SCALE_FACTOR
-        w = self.width
-
-        # To be calculated
-        d = None
-        theta = None
-        phi = None
-
-        if sl == sr:
-            # going straight forwards
-            d, phi = (sl * t, 0)
-            theta = 0
-        else:
-            r = (sl * w) / (sr - sl) + 0.5 * w
-            if r == 0:
-                # Turning on the spot
-                d, phi = (0, 0)
-                theta = (sr * t) / (0.5 * w)
-            else:
-                sa = (sl + sr) / 2
-                theta = sa * t / r
-                d = (r * sin(theta)) * sin((pi - theta) / 2)
-                phi = 0.5*pi - (pi - theta) / 2
-
-        # Work out how this translates to coordinates
-        dx = d * cos(phi - self.heading)
-        dy = -d * sin(phi - self.heading)
-        return dx, dy, -theta
-
-    def _move_and_rotate(self, move_by, dh):
-        x, y = self.location
-        new_heading = self.heading + dh
-        if new_heading > pi:
-            new_heading -= 2 * pi
-        elif new_heading < -pi:
-            new_heading += 2 * pi
-        new_location = (x + move_by[0], y + move_by[1])
-        new_corners = self._calculate_corners(new_location, new_heading)
-        can_move = [True, True]
-        can_rotate = True
-        friction_factor = 1
-        for i, c in enumerate(new_corners):
-            inside, dim, furthest = self.arena.contains_point(c)
-            if not inside:
-                can_rotate = False  # a passable approximation
-
-                # Work out where the collision actually happens, and move to that point
-                new_d = furthest - self.corners[i][dim]
-                if move_by[dim] > 0 and new_d > 0 or move_by[dim] < 0 and new_d < 0:
-                    # Shorten the vector so that it just touches the wall
-                    fraction = new_d / move_by[dim]
-                    move_by = (new_d, move_by[1] * fraction) if dim == 0 else \
-                              (move_by[0] * fraction, new_d)
-
-                    # Recalculate the corner locations for the new vector
-                    new_location = (x + move_by[0], y + move_by[1])
-                    new_corners = self._calculate_corners(new_location, new_heading)
-                else:
-                    # Robot already touching the wall, so slide along it
-                    can_move[dim] = False
-                    friction_factor *= 0.3
-
-        # TODO: Turn towards the wall when pushing against it
-
-        self.location = (x + (move_by[0] * friction_factor) if can_move[0] else x, \
-                         y + (move_by[1] * friction_factor) if can_move[1] else y)
-
-        if can_rotate:
-            self.heading = new_heading
-
-        if can_rotate or can_move[0] or can_move[1]:
-            self.corners = new_corners
-            if self._holding != None:
-                self._holding.location = (x + cos(self.heading) * GRABBER_OFFSET, \
-                                          y + sin(self.heading) * GRABBER_OFFSET)
+    def _apply_wheel_force(self, y_position, power):
+        location_world_space = self._body.get_world_point((0, y_position))
+        force_magnitude = power * 0.6
+        # account for friction
+        frict_world = self._body.get_linear_velocity_from_local_point((0, y_position))
+        frict_x, frict_y = self._body.get_local_vector(frict_world)
+        force_magnitude -= frict_x * 50.2
+        force_world_space = (force_magnitude * cos(self.heading),
+                             force_magnitude * sin(self.heading))
+        self._body.apply_force(force_world_space, location_world_space)
 
     ## "Public" methods for simulator code ##
 
     def tick(self, time_passed):
         with self.lock:
-            dx, dy, dh = self._calculate_movement(time_passed)
-            self._move_and_rotate((dx, dy), dh)
+            half_width = self.width * 0.5
+            # left wheel
+            self._apply_wheel_force(-half_width, self.motors[0].m0.power)
+            # right wheel
+            self._apply_wheel_force( half_width, self.motors[0].m1.power)
+            # kill the lateral velocity
+            right_normal = self._body.get_world_vector((0, 1))
+            lateral_vel = (right_normal.dot(self._body.linear_velocity) *
+                           right_normal)
+            impulse = self._body.mass * -lateral_vel
+            self._body.apply_linear_impulse(impulse, self._body.world_center)
 
     ## "Public" methods for user code ##
 
@@ -183,9 +150,13 @@ class SimRobot(GameObject):
         objects = filter(object_filter, self.arena.objects)
         if objects:
             self._holding = objects[0]
+            if hasattr(self._holding, '_body'):
+                with self.lock:
+                    self._holding_joint = self._body._world.create_weld_joint(self._body,
+                                                                              self._holding._body,
+                                                                              local_anchor_a=(GRABBER_OFFSET, 0),
+                                                                              local_anchor_b=(0, 0))
             self._holding.grab()
-            self._holding.location = (x + cos(heading) * GRABBER_OFFSET, \
-                                      y + sin(heading) * GRABBER_OFFSET)
             return True
         else:
             return False
@@ -193,6 +164,10 @@ class SimRobot(GameObject):
     def release(self):
         if self._holding is not None:
             self._holding.release()
+            if hasattr(self._holding, '_body'):
+                with self.lock:
+                    self._body.world.destroy_joint(self._holding_joint)
+                self._holding_joint = None
             self._holding = None
             return True
         else:
