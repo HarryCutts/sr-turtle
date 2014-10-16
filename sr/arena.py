@@ -62,8 +62,41 @@ class Arena(object):
         self._populate_wall(left = (self.left, self.top), right = (self.right, self.top),
                             count = MARKERS_PER_WALL, start = 3*MARKERS_PER_WALL, angle = 3*pi / 2)
 
-    def __init__(self, objects=None, wall_markers=True, num_tokens=5):
+    def _init_physics(self):
         self._physics_world = pypybox2d.world.World(gravity=(0, 0))
+        # Create the arena wall
+        WALL_WIDTH = 2
+
+        wall_right = self._physics_world.create_body(position=(self.right, 0),
+                                                     type=pypybox2d.body.Body.STATIC)
+        wall_right.create_polygon_fixture([(WALL_WIDTH, self.top - WALL_WIDTH),
+                                           (WALL_WIDTH, self.bottom + WALL_WIDTH),
+                                           (0, self.bottom + WALL_WIDTH),
+                                           (0, self.top - WALL_WIDTH)])
+
+        wall_left = self._physics_world.create_body(position=(self.left, 0),
+                                                    type=pypybox2d.body.Body.STATIC)
+        wall_left.create_polygon_fixture([(-WALL_WIDTH, self.top - WALL_WIDTH),
+                                          (0, self.top - WALL_WIDTH),
+                                          (0, self.bottom + WALL_WIDTH),
+                                          (-WALL_WIDTH, self.bottom + WALL_WIDTH)])
+
+        wall_top = self._physics_world.create_body(position=(0, self.top),
+                                                   type=pypybox2d.body.Body.STATIC)
+        wall_top.create_polygon_fixture([(self.left, 0),
+                                         (self.left, -WALL_WIDTH),
+                                         (self.right, -WALL_WIDTH),
+                                         (self.right, 0)])
+
+        wall_bottom = self._physics_world.create_body(position=(0, self.bottom),
+                                                   type=pypybox2d.body.Body.STATIC)
+        wall_bottom.create_polygon_fixture([(self.left, 0),
+                                            (self.right, 0),
+                                            (self.right, WALL_WIDTH),
+                                            (self.left, WALL_WIDTH)])
+
+    def __init__(self, objects=None, wall_markers=True, num_tokens=5):
+        self._init_physics()
         self.objects = objects if objects is not None else []
         if wall_markers:
             self._populate_wall_markers()
