@@ -26,11 +26,11 @@ class Token(GameObject):
             return # Slight hack: deal with the initial setting from the constructor
         self._body.angle = _new_heading
 
-    def __init__(self, arena, number):
+    def __init__(self, arena, number, damping):
         self._body = arena._physics_world.create_body(position=(0, 0),
                                                       angle=0,
-                                                      linear_damping=0.5,
-                                                      angular_damping=0.5,
+                                                      linear_damping=damping,
+                                                      angular_damping=damping,
                                                       type=pypybox2d.body.Body.DYNAMIC)
         GameObject.__init__(self, arena)
         self.marker_info = create_marker_info_by_type(MARKER_TOKEN, number)
