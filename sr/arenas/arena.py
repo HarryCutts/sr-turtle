@@ -123,8 +123,8 @@ class Arena(object):
     def tick(self, time_passed):
         with self.physics_lock:
             self._physics_world.step(time_passed,
-                                     vel_iters=12,
-                                     pos_iters=12)
+                                     vel_iters=8,
+                                     pos_iters=3)
         for obj in self.objects:
             if hasattr(obj, "tick"):
                 obj.tick(time_passed)
