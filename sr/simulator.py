@@ -11,7 +11,12 @@ GAMES = {'pirate-plunder': PiratePlunderArena}
 
 class Simulator(object):
     def __init__(self, config={}, size=(8, 8), frames_per_second=30):
-        game = GAMES[config.get('game', DEFAULT_GAME)]
+        try:
+            game_name = config['game']
+            del config['game']
+        except KeyError:
+            game_name = DEFAULT_GAME
+        game = GAMES[game_name]
         self.arena = game(**config)
 
         self.display = Display(self.arena)
