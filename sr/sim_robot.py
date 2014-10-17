@@ -65,23 +65,27 @@ class SimRobot(GameObject):
 
     @property
     def location(self):
-        return self._body.world_center
+        with self.lock:
+            return self._body.position
 
     @location.setter
     def location(self, new_pos):
         if self._body is None:
             return # Slight hack: deal with the initial setting from the constructor
-        #self._body.world_center = new_pos
+        with self.lock:
+            self._body.position = new_pos
 
     @property
     def heading(self):
-        return self._body.angle
+        with self.lock:
+            return self._body.angle
 
     @heading.setter
     def heading(self, _new_heading):
         if self._body is None:
             return # Slight hack: deal with the initial setting from the constructor
-        self._body.angle = _new_heading
+        with self.lock:
+            self._body.angle = _new_heading
 
     def __init__(self, simulator):
         self._body = None
