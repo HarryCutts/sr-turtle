@@ -65,29 +65,32 @@ class SimRobot(GameObject):
 
     @property
     def location(self):
-        return self._body.world_center
+        with self.lock:
+            return self._body.position
 
     @location.setter
     def location(self, new_pos):
         if self._body is None:
             return # Slight hack: deal with the initial setting from the constructor
-        #self._body.world_center = new_pos
+        with self.lock:
+            self._body.position = new_pos
 
     @property
     def heading(self):
-        return self._body.angle
+        with self.lock:
+            return self._body.angle
 
     @heading.setter
     def heading(self, _new_heading):
         if self._body is None:
             return # Slight hack: deal with the initial setting from the constructor
-        self._body.angle = _new_heading
+        with self.lock:
+            self._body.angle = _new_heading
 
     def __init__(self, simulator):
         self._body = None
         GameObject.__init__(self, simulator.arena)
         self.motors = [Motor(self)]
-        simulator.arena.objects.append(self)
         make_body = simulator.arena._physics_world.create_body
         half_width = self.width * 0.5
         self._body = make_body(position=(0, 0),
@@ -100,6 +103,7 @@ class SimRobot(GameObject):
                                            ( half_width,  half_width),
                                            (-half_width,  half_width)],
                                           density=500*0.12) # MDF @ 12cm thickness
+        simulator.arena.objects.append(self)
 
 
     ## Internal methods ##
@@ -118,7 +122,7 @@ class SimRobot(GameObject):
     ## "Public" methods for simulator code ##
 
     def tick(self, time_passed):
-        with self.lock:
+        with self.lock, self.arena.physics_lock:
             half_width = self.width * 0.5
             # left wheel
             self._apply_wheel_force(-half_width, self.motors[0].m0.power)
@@ -151,7 +155,7 @@ class SimRobot(GameObject):
         if objects:
             self._holding = objects[0]
             if hasattr(self._holding, '_body'):
-                with self.lock:
+                with self.lock, self.arena.physics_lock:
                     self._holding_joint = self._body._world.create_weld_joint(self._body,
                                                                               self._holding._body,
                                                                               local_anchor_a=(GRABBER_OFFSET, 0),
@@ -165,7 +169,7 @@ class SimRobot(GameObject):
         if self._holding is not None:
             self._holding.release()
             if hasattr(self._holding, '_body'):
-                with self.lock:
+                with self.lock, self.arena.physics_lock:
                     self._body.world.destroy_joint(self._holding_joint)
                 self._holding_joint = None
             self._holding = None

@@ -11,7 +11,7 @@ class PiratePlunderArena(Arena):
         super(PiratePlunderArena, self).__init__(objects, wall_markers)
 
         for i in range(num_tokens):
-            token = Token(self, i)
+            token = Token(self, i, damping=10)
             token.location = (random() * 4 - 2, random() * 4 - 2)
             self.objects.append(token)
 

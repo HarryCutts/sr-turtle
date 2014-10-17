@@ -7,6 +7,8 @@ from random import random
 from ..display import get_surface, PIXELS_PER_METER
 from ..markers import WallMarker, Token
 
+import threading
+
 import pypybox2d
 
 MARKERS_PER_WALL = 7
@@ -64,36 +66,43 @@ class Arena(object):
 
     def _init_physics(self):
         self._physics_world = pypybox2d.world.World(gravity=(0, 0))
+        # Global lock for simulation
+        self.physics_lock = threading.RLock()
         # Create the arena wall
         WALL_WIDTH = 2
+        WALL_SETTINGS = {'restitution': 0.2, 'friction': 0.3}
 
         wall_right = self._physics_world.create_body(position=(self.right, 0),
                                                      type=pypybox2d.body.Body.STATIC)
         wall_right.create_polygon_fixture([(WALL_WIDTH, self.top - WALL_WIDTH),
                                            (WALL_WIDTH, self.bottom + WALL_WIDTH),
                                            (0, self.bottom + WALL_WIDTH),
-                                           (0, self.top - WALL_WIDTH)])
+                                           (0, self.top - WALL_WIDTH)],
+                                          **WALL_SETTINGS)
 
         wall_left = self._physics_world.create_body(position=(self.left, 0),
                                                     type=pypybox2d.body.Body.STATIC)
         wall_left.create_polygon_fixture([(-WALL_WIDTH, self.top - WALL_WIDTH),
                                           (0, self.top - WALL_WIDTH),
                                           (0, self.bottom + WALL_WIDTH),
-                                          (-WALL_WIDTH, self.bottom + WALL_WIDTH)])
+                                          (-WALL_WIDTH, self.bottom + WALL_WIDTH)],
+                                         **WALL_SETTINGS)
 
         wall_top = self._physics_world.create_body(position=(0, self.top),
                                                    type=pypybox2d.body.Body.STATIC)
         wall_top.create_polygon_fixture([(self.left, 0),
                                          (self.left, -WALL_WIDTH),
                                          (self.right, -WALL_WIDTH),
-                                         (self.right, 0)])
+                                         (self.right, 0)],
+                                        **WALL_SETTINGS)
 
         wall_bottom = self._physics_world.create_body(position=(0, self.bottom),
                                                    type=pypybox2d.body.Body.STATIC)
         wall_bottom.create_polygon_fixture([(self.left, 0),
                                             (self.right, 0),
                                             (self.right, WALL_WIDTH),
-                                            (self.left, WALL_WIDTH)])
+                                            (self.left, WALL_WIDTH)],
+                                           **WALL_SETTINGS)
 
     def __init__(self, objects=None, wall_markers=True):
         self._init_physics()
@@ -112,9 +121,10 @@ class Arena(object):
             return True, None, None
 
     def tick(self, time_passed):
-        self._physics_world.step(time_passed,
-                                 vel_iters=12,
-                                 pos_iters=12)
+        with self.physics_lock:
+            self._physics_world.step(time_passed,
+                                     vel_iters=12,
+                                     pos_iters=12)
         for obj in self.objects:
             if hasattr(obj, "tick"):
                 obj.tick(time_passed)

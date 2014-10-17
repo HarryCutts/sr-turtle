@@ -26,15 +26,23 @@ class Token(GameObject):
             return # Slight hack: deal with the initial setting from the constructor
         self._body.angle = _new_heading
 
-    def __init__(self, arena, number):
+    def __init__(self, arena, number, damping):
         self._body = arena._physics_world.create_body(position=(0, 0),
                                                       angle=0,
-                                                      fixed_rotation=True,
+                                                      linear_damping=damping,
+                                                      angular_damping=damping,
                                                       type=pypybox2d.body.Body.DYNAMIC)
         GameObject.__init__(self, arena)
         self.marker_info = create_marker_info_by_type(MARKER_TOKEN, number)
         self.grabbed = False
-        self._body.create_circle_fixture(radius=0.1, density=1)
+        WIDTH=0.08
+        self._body.create_polygon_fixture([(-WIDTH, -WIDTH),
+                                           ( WIDTH, -WIDTH),
+                                           ( WIDTH,  WIDTH),
+                                           (-WIDTH,  WIDTH)],
+                                          density=1,
+                                          restitution=0.2,
+                                          friction=0.3)
 
     def grab(self):
         self.grabbed = True
