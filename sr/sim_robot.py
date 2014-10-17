@@ -2,8 +2,7 @@
 
 from __future__ import division
 
-import pygame, time, exceptions
-from pygame.locals import *
+import time, exceptions
 from math import pi, sin, cos, degrees, hypot, atan2
 
 from game_object import GameObject
