@@ -8,33 +8,24 @@ Installing and running
 
 The simulator requires a Python 2.7 installation, the [pygame](http://pygame.org/) library, and [PyPyBox2D](https://pypi.python.org/pypi/pypybox2d/2.1-r331). Once those are installed, simply run the `test.py` script to test out the simulator.
 
-Writing a program
------------------
+Writing and running a program
+-----------------------------
 
 Keep your programs in the directory containing the simulator files, so that the `sr` module can be imported.
 
-An example program can be found in `test.py`, which implements a simple state machine and does a pretty shoddy job of finding and picking up tokens. A template is also provided in `template.py`.
+To run one or more scripts in the simulator, use `run.py`, passing it the file names. You can also pass it a configuration [YAML](http://yaml.org/) file with the `--config` switch, which sets the game to be used and other parameters (such as the number of tokens in a Pirate Plunder game).
 
-Where a program using the SR API would begin:
+An example program can be found in `test.py`, which implements a simple state machine and does a pretty shoddy job of finding and picking up tokens. To try it, run the following:
 
-```python
-from sr import *
-
-R = Robot()
+```bash
+$ python run.py test.py
 ```
 
-a program using the simulator API begins:
+To pit three test robots against one another, pass the script in three times:
 
-```python
-from sr import *
-
-sim = Simulator()
-R = SimRobot(sim)
+```bash
+$ python run.py test.py test.py test.py
 ```
-
-`Simulator()` creates a new simulator, with an 8 metre square arena containing 5 tokens and 27 wall markers, just like the real SR arena. (The `size` and `num_tokens` parameters can be used to change these.) The `SimRobot` object replaces the `Robot` object, and must have a `Simulator` object passed to its constructor.
-
-After this, calls can be made to the simulator API through the `R` object.
 
 Robot API
 ---------
