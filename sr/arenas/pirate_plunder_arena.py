@@ -1,12 +1,23 @@
 from __future__ import division
 
 import pygame
+from math import pi
 from random import random
 
 from arena import Arena, ARENA_MARKINGS_COLOR, ARENA_MARKINGS_WIDTH
 from ..markers import Token
 
 class PiratePlunderArena(Arena):
+    start_locations = [( 0, -3),
+                       ( 3,  0),
+                       ( 0,  3),
+                       (-3,  0)]
+
+    start_headings = [0.5*pi,
+                      pi,
+                      -0.5*pi,
+                      0]
+
     def __init__(self, objects=None, wall_markers=True, num_tokens=5):
         super(PiratePlunderArena, self).__init__(objects, wall_markers)
 

@@ -46,6 +46,16 @@ class CTFWall(GameObject):
     surface_name = 'sr/wall.png'
 
 class CTFArena(Arena):
+    start_locations = [(-3.6, -3.6),
+                       ( 3.6, -3.6),
+                       ( 3.6,  3.6),
+                       (-3.6,  3.6)]
+
+    start_headings = [0.25*pi,
+                      0.75*pi,
+                      -0.75*pi,
+                      -0.25*pi]
+
     def __init__(self, objects=None, wall_markers=True):
         super(CTFArena, self).__init__(objects, wall_markers)
         self._init_walls()

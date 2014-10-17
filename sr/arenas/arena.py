@@ -21,6 +21,8 @@ def lerp(delta, a, b):
 
 class Arena(object):
     size = (8, 8)
+    start_locations = [(0, 0)]
+    start_headings = [0]
 
     zone_size = 1
 
