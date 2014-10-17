@@ -87,7 +87,6 @@ class SimRobot(GameObject):
         self._body = None
         GameObject.__init__(self, simulator.arena)
         self.motors = [Motor(self)]
-        simulator.arena.objects.append(self)
         make_body = simulator.arena._physics_world.create_body
         half_width = self.width * 0.5
         self._body = make_body(position=(0, 0),
@@ -100,6 +99,7 @@ class SimRobot(GameObject):
                                            ( half_width,  half_width),
                                            (-half_width,  half_width)],
                                           density=500*0.12) # MDF @ 12cm thickness
+        simulator.arena.objects.append(self)
 
 
     ## Internal methods ##
