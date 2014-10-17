@@ -7,7 +7,7 @@ from pygame.locals import *
 from math import pi, sin, cos, degrees, hypot, atan2
 
 from game_object import GameObject
-from vision import Marker, Point, PolarCoord
+from vision import Marker, Point, PolarCoord, create_marker_info_by_type, MARKER_ROBOT
 
 import pypybox2d
 
@@ -87,8 +87,13 @@ class SimRobot(GameObject):
         with self.lock:
             self._body.angle = _new_heading
 
+    @property
+    def marker_info(self):
+        return create_marker_info_by_type(MARKER_ROBOT, self.zone)
+
     def __init__(self, simulator):
         self._body = None
+        self.zone = 0
         GameObject.__init__(self, simulator.arena)
         self.motors = [Motor(self)]
         make_body = simulator.arena._physics_world.create_body
@@ -148,8 +153,10 @@ class SimRobot(GameObject):
         def object_filter(o):
             rel_x, rel_y = (o.location[0] - x, o.location[1] - y)
             direction = atan2(rel_y, rel_x)
-            return o.grabbable and hypot(rel_x, rel_y) <= GRAB_RADIUS and \
-                   -HALF_GRAB_SECTOR_WIDTH < direction - heading < HALF_GRAB_SECTOR_WIDTH
+            return (o.grabbable and
+                    hypot(rel_x, rel_y) <= GRAB_RADIUS and
+                    -HALF_GRAB_SECTOR_WIDTH < direction - heading < HALF_GRAB_SECTOR_WIDTH and
+                    not o.grabbed)
 
         objects = filter(object_filter, self.arena.objects)
         if objects:
@@ -202,6 +209,7 @@ class SimRobot(GameObject):
             # Choose only marked objects within the field of view
             direction = atan2(o.location[1] - y, o.location[0] - x)
             return (o.marker_info != None and
+                    o is not self and
                     -HALF_FOV_WIDTH < direction - heading < HALF_FOV_WIDTH and
                     not motion_blurred(o))
 
