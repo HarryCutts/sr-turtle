@@ -56,17 +56,20 @@ class CTFArena(Arena):
                       -0.75*pi,
                       -0.25*pi]
 
-    def __init__(self, objects=None, wall_markers=True):
+    def __init__(self, objects=None, wall_markers=True, zone_flags=True):
         super(CTFArena, self).__init__(objects, wall_markers)
         self._init_walls()
-        self._init_tokens()
+        self._init_tokens(zone_flags)
 
-    def _init_tokens(self):
-        token_locations = [(-3.2, -3.2),
-                           ( 3.2, -3.2),
-                           ( 3.2,  3.2),
-                           (-3.2,  3.2),
-                           (   0,    0)]
+    def _init_tokens(self, zone_flags):
+        if zone_flags:
+            token_locations = [(-3.2, -3.2),
+                               ( 3.2, -3.2),
+                               ( 3.2,  3.2),
+                               (-3.2,  3.2),
+                               (   0,    0)]
+        else:
+            token_locations = [(0, 0)]
 
         for i, location in enumerate(token_locations):
             token = Token(self, i, damping=0.5)
