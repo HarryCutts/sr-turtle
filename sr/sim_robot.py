@@ -191,12 +191,11 @@ class SimRobot(GameObject):
 
         acq_time = time.time()
 
-        MOTION_BLUR_POWER_THRESHOLD = 5
+        MOTION_BLUR_SPEED_THRESHOLD = 5
 
         def robot_moving(o):
-            return any(abs(board.m0.power) > MOTION_BLUR_POWER_THRESHOLD or
-                       abs(board.m1.power) > MOTION_BLUR_POWER_THRESHOLD
-                        for board in o.motors)
+            vx, vy = o._body.linear_velocity
+            return hypot(vx, vy) > MOTION_BLUR_SPEED_THRESHOLD
 
         def motion_blurred(o):
             # Simple approximation: we can't see anything if either it's moving
