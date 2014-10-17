@@ -35,10 +35,14 @@ class Token(GameObject):
         GameObject.__init__(self, arena)
         self.marker_info = create_marker_info_by_type(MARKER_TOKEN, number)
         self.grabbed = False
-        self._body.create_circle_fixture(radius=0.1,
-                                         density=1,
-                                         restitution=0.2,
-                                         friction=0.3)
+        WIDTH=0.08
+        self._body.create_polygon_fixture([(-WIDTH, -WIDTH),
+                                           ( WIDTH, -WIDTH),
+                                           ( WIDTH,  WIDTH),
+                                           (-WIDTH,  WIDTH)],
+                                          density=1,
+                                          restitution=0.2,
+                                          friction=0.3)
 
     def grab(self):
         self.grabbed = True
