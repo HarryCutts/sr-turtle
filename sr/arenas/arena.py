@@ -66,34 +66,39 @@ class Arena(object):
         self._physics_world = pypybox2d.world.World(gravity=(0, 0))
         # Create the arena wall
         WALL_WIDTH = 2
+        WALL_SETTINGS = {'restitution': 0.2, 'friction': 0.3}
 
         wall_right = self._physics_world.create_body(position=(self.right, 0),
                                                      type=pypybox2d.body.Body.STATIC)
         wall_right.create_polygon_fixture([(WALL_WIDTH, self.top - WALL_WIDTH),
                                            (WALL_WIDTH, self.bottom + WALL_WIDTH),
                                            (0, self.bottom + WALL_WIDTH),
-                                           (0, self.top - WALL_WIDTH)])
+                                           (0, self.top - WALL_WIDTH)],
+                                          **WALL_SETTINGS)
 
         wall_left = self._physics_world.create_body(position=(self.left, 0),
                                                     type=pypybox2d.body.Body.STATIC)
         wall_left.create_polygon_fixture([(-WALL_WIDTH, self.top - WALL_WIDTH),
                                           (0, self.top - WALL_WIDTH),
                                           (0, self.bottom + WALL_WIDTH),
-                                          (-WALL_WIDTH, self.bottom + WALL_WIDTH)])
+                                          (-WALL_WIDTH, self.bottom + WALL_WIDTH)],
+                                         **WALL_SETTINGS)
 
         wall_top = self._physics_world.create_body(position=(0, self.top),
                                                    type=pypybox2d.body.Body.STATIC)
         wall_top.create_polygon_fixture([(self.left, 0),
                                          (self.left, -WALL_WIDTH),
                                          (self.right, -WALL_WIDTH),
-                                         (self.right, 0)])
+                                         (self.right, 0)],
+                                        **WALL_SETTINGS)
 
         wall_bottom = self._physics_world.create_body(position=(0, self.bottom),
                                                    type=pypybox2d.body.Body.STATIC)
         wall_bottom.create_polygon_fixture([(self.left, 0),
                                             (self.right, 0),
                                             (self.right, WALL_WIDTH),
-                                            (self.left, WALL_WIDTH)])
+                                            (self.left, WALL_WIDTH)],
+                                           **WALL_SETTINGS)
 
     def __init__(self, objects=None, wall_markers=True):
         self._init_physics()
