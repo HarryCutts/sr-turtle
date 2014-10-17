@@ -98,16 +98,17 @@ class SimRobot(GameObject):
         self.motors = [Motor(self)]
         make_body = simulator.arena._physics_world.create_body
         half_width = self.width * 0.5
-        self._body = make_body(position=(0, 0),
-                               angle=0,
-                               linear_damping=0.0,
-                               angular_damping=0.0,
-                               type=pypybox2d.body.Body.DYNAMIC)
-        self._body.create_polygon_fixture([(-half_width, -half_width),
-                                           ( half_width, -half_width),
-                                           ( half_width,  half_width),
-                                           (-half_width,  half_width)],
-                                          density=500*0.12) # MDF @ 12cm thickness
+        with self.arena.physics_lock:
+            self._body = make_body(position=(0, 0),
+                                   angle=0,
+                                   linear_damping=0.0,
+                                   angular_damping=0.0,
+                                   type=pypybox2d.body.Body.DYNAMIC)
+            self._body.create_polygon_fixture([(-half_width, -half_width),
+                                               ( half_width, -half_width),
+                                               ( half_width,  half_width),
+                                               (-half_width,  half_width)],
+                                              density=500*0.12) # MDF @ 12cm thickness
         simulator.arena.objects.append(self)
 
 
