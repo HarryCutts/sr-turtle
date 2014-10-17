@@ -5,9 +5,19 @@ import threading, time, pygame
 from arenas import PiratePlunderArena
 from display import Display
 
+DEFAULT_GAME = 'pirate-plunder'
+
+GAMES = {'pirate-plunder': PiratePlunderArena}
+
 class Simulator(object):
-    def __init__(self, num_tokens=5, size=(8, 8), frames_per_second=30):
-        self.arena = PiratePlunderArena(num_tokens=num_tokens)
+    def __init__(self, config={}, size=(8, 8), frames_per_second=30):
+        try:
+            game_name = config['game']
+            del config['game']
+        except KeyError:
+            game_name = DEFAULT_GAME
+        game = GAMES[game_name]
+        self.arena = game(**config)
 
         self.display = Display(self.arena)
 
