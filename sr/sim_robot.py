@@ -55,7 +55,7 @@ class Motor:
                .format(self.serialnum)
 
 class SimRobot(GameObject):
-    width = 0.48
+    width = 0.45
 
     surface_name = 'sr/robot.png'
 
