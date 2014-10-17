@@ -7,6 +7,8 @@ from random import random
 from ..display import get_surface, PIXELS_PER_METER
 from ..markers import WallMarker, Token
 
+import threading
+
 import pypybox2d
 
 MARKERS_PER_WALL = 7
@@ -64,6 +66,8 @@ class Arena(object):
 
     def _init_physics(self):
         self._physics_world = pypybox2d.world.World(gravity=(0, 0))
+        # Global lock for simulation
+        self.physics_lock = threading.RLock()
         # Create the arena wall
         WALL_WIDTH = 2
         WALL_SETTINGS = {'restitution': 0.2, 'friction': 0.3}
@@ -117,9 +121,10 @@ class Arena(object):
             return True, None, None
 
     def tick(self, time_passed):
-        self._physics_world.step(time_passed,
-                                 vel_iters=12,
-                                 pos_iters=12)
+        with self.physics_lock:
+            self._physics_world.step(time_passed,
+                                     vel_iters=12,
+                                     pos_iters=12)
         for obj in self.objects:
             if hasattr(obj, "tick"):
                 obj.tick(time_passed)

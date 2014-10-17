@@ -122,7 +122,7 @@ class SimRobot(GameObject):
     ## "Public" methods for simulator code ##
 
     def tick(self, time_passed):
-        with self.lock:
+        with self.lock, self.arena.physics_lock:
             half_width = self.width * 0.5
             # left wheel
             self._apply_wheel_force(-half_width, self.motors[0].m0.power)
@@ -155,7 +155,7 @@ class SimRobot(GameObject):
         if objects:
             self._holding = objects[0]
             if hasattr(self._holding, '_body'):
-                with self.lock:
+                with self.lock, self.arena.physics_lock:
                     self._holding_joint = self._body._world.create_weld_joint(self._body,
                                                                               self._holding._body,
                                                                               local_anchor_a=(GRABBER_OFFSET, 0),
@@ -169,7 +169,7 @@ class SimRobot(GameObject):
         if self._holding is not None:
             self._holding.release()
             if hasattr(self._holding, '_body'):
-                with self.lock:
+                with self.lock, self.arena.physics_lock:
                     self._body.world.destroy_joint(self._holding_joint)
                 self._holding_joint = None
             self._holding = None
