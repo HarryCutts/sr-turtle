@@ -29,7 +29,6 @@ class Token(GameObject):
     def __init__(self, arena, number):
         self._body = arena._physics_world.create_body(position=(0, 0),
                                                       angle=0,
-                                                      fixed_rotation=True,
                                                       type=pypybox2d.body.Body.DYNAMIC)
         GameObject.__init__(self, arena)
         self.marker_info = create_marker_info_by_type(MARKER_TOKEN, number)
