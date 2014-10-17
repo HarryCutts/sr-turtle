@@ -10,7 +10,7 @@ DEFAULT_GAME = 'pirate-plunder'
 GAMES = {'pirate-plunder': PiratePlunderArena}
 
 class Simulator(object):
-    def __init__(self, config={}, size=(8, 8), frames_per_second=30):
+    def __init__(self, config={}, size=(8, 8), frames_per_second=30, foreground=False):
         try:
             game_name = config['game']
             del config['game']
@@ -21,9 +21,18 @@ class Simulator(object):
 
         self.display = Display(self.arena)
 
-        self._loop_thread = threading.Thread(target=self._main_loop, args=(frames_per_second,))
-        self._loop_thread.setDaemon(True)
-        self._loop_thread.start()
+        self.foreground = foreground
+        self.frames_per_second = frames_per_second
+
+        if not self.foreground:
+            self._loop_thread = threading.Thread(target=self._main_loop, args=(frames_per_second,))
+            self._loop_thread.setDaemon(True)
+            self._loop_thread.start()
+
+    def run(self):
+        if not self.foreground:
+            raise RuntimeError('Simulator runs in the background. Try passing foreground=True')
+        self._main_loop(self.frames_per_second)
 
     def _main_loop(self, frames_per_second):
         clock = pygame.time.Clock()
