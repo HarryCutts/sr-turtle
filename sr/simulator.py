@@ -39,14 +39,12 @@ class Simulator(object):
         clock = pygame.time.Clock()
 
         while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    return
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    return
+            if any(event.type == pygame.QUIT
+                    or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)
+                    for event in pygame.event.get()):
+                break
 
             self.display.tick(1/frames_per_second)
             clock.tick(frames_per_second)
 
-    def __del__(self):
         pygame.quit()
