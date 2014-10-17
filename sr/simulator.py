@@ -2,12 +2,13 @@ from __future__ import division
 
 import threading, time, pygame
 
-from arenas import PiratePlunderArena
+from arenas import PiratePlunderArena, CTFArena
 from display import Display
 
 DEFAULT_GAME = 'pirate-plunder'
 
-GAMES = {'pirate-plunder': PiratePlunderArena}
+GAMES = {'pirate-plunder': PiratePlunderArena,
+         'ctf': CTFArena}
 
 class Simulator(object):
     def __init__(self, config={}, size=(8, 8), frames_per_second=30):
