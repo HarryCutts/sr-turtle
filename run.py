@@ -4,7 +4,7 @@ import threading
 import argparse
 from math import pi
 
-from sr import *
+from sr.robot import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--config',

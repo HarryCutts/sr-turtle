@@ -1,4 +1,4 @@
-from sr import *
+from sr.robot import *
 
 import time
 
