@@ -6,7 +6,11 @@ This is a simple, portable robot simulator developed for [Student Robotics](http
 Installing and running
 ----------------------
 
-The simulator requires a Python 2.7 installation, the [pygame](http://pygame.org/) library, and [PyPyBox2D](https://pypi.python.org/pypi/pypybox2d/2.1-r331). Once those are installed, simply run the `test.py` script to test out the simulator.
+The simulator requires a Python 2.7 installation, the [pygame](http://pygame.org/) library, and [PyPyBox2D](https://pypi.python.org/pypi/pypybox2d/2.1-r331).
+
+Pygame, unfortunately, is tricky (though [not impossible](http://askubuntu.com/q/312767)) to install in virtual environments. It's easiest to use your operating system's package manager. Windows users could use [Portable Python](http://portablepython.com/). PyPyBox2D is more forgiving, and should install just fine using `pip` or `easy_install`.
+
+Once the dependencies are installed, simply run the `test.py` script to test out the simulator.
 
 Writing and running a program
 -----------------------------
