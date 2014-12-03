@@ -43,8 +43,8 @@ The simulated robot has two motors configured for skid steering, connected to a 
 The Motor Board API is identical to [that of the SR API](https://studentrobotics.org/docs/programming/sr/motors/), except that motor boards cannot be addressed by serial number. So, to turn on the spot at one quarter of full power, one might write the following:
 
 ```python
-R.motors[0].m0 = 25
-R.motors[0].m1 = -25
+R.motors[0].m0.power = 25
+R.motors[0].m1.power = -25
 ```
 
 ### The Grabber ###
