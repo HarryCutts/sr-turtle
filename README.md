@@ -71,9 +71,13 @@ Each `Marker` object has the following attributes:
   * `code`: the numeric code of the marker.
   * `marker_type`: the type of object the marker is attached to (either `MARKER_TOKEN` or `MARKER_ARENA`).
   * `offset`: offset of the numeric code of the marker from the lowest numbered marker of its type. For example, token number 3 has the code 43, but offset 3.
+  * `size`: the size that the marker would be in the real game, for compatibility with the SR API.
 * `centre`: the location of the marker in polar coordinates, as a `PolarCoord` object. Has the following attributes:
   * `length`: the distance from the centre of the robot to the object (in metres).
   * `rot_y`: rotation about the Y axis in degrees.
+* `dist`: an alias for `centre.length`
+* `res`: the value of the `res` parameter of `R.see`, for compatibility with the SR API.
+* `rot_y`: an alias for `centre.rot_y`
 * `timestamp`: the time at which the marker was seen (when `R.see` was called).
 
 For example, the following code lists all of the markers the robot can see:
