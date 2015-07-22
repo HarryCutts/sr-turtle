@@ -18,6 +18,8 @@ class PiratePlunderArena(Arena):
                       -0.5*pi,
                       0]
 
+    zone_size = 1
+
     def __init__(self, objects=None, wall_markers=True, num_tokens=5):
         super(PiratePlunderArena, self).__init__(objects, wall_markers)
 

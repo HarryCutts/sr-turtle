@@ -24,8 +24,6 @@ class Arena(object):
     start_locations = [(0, 0)]
     start_headings = [0]
 
-    zone_size = 1
-
     motif_name = 'sr/sr_round_flat.png'
 
     @property
