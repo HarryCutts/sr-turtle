@@ -1,21 +1,36 @@
 from collections import namedtuple
 
-# From pyenv.git/pylib/sr/vision.py
-MARKER_ARENA, MARKER_ROBOT, MARKER_PEDESTAL, MARKER_TOKEN = range(4)
+MARKER_ARENA = 'arena'
+MARKER_ROBOT = 'robot'
+
+MARKER_PEDESTAL = 'pedestal'
+MARKER_TOKEN = 'token'
+
+MARKER_FLAG = 'token'
+    # Old simulator versions used MARKER_TOKEN for flags. This retains backward
+    # compatibility.
+
+MARKER_TOKEN_GOLD   = 'token_gold'
+MARKER_TOKEN_SILVER = 'token_silver'
 
 marker_offsets = {
     MARKER_ARENA: 0,
     MARKER_ROBOT: 28,
-    MARKER_PEDESTAL: 32,
-    MARKER_TOKEN: 41
 }
 
 marker_sizes = {
     MARKER_ARENA: 0.25 * (10.0/12),
     MARKER_ROBOT: 0.1 * (10.0/12),
-    MARKER_PEDESTAL: 0.2 * (10.0/12),
-    MARKER_TOKEN: 0.2 * (10.0/12)
 }
+
+def init_marker_info(arena_class):
+    """
+    Initialize the `marker_offsets` and `marker_sizes` dictionaries for the
+    given arena. The dictionaries from the given arena class are combined with
+    the default dictionaries.
+    """
+    marker_offsets.update(arena_class.marker_offsets)
+    marker_sizes.update(arena_class.marker_sizes)
 
 # MarkerInfo class
 MarkerInfo = namedtuple( "MarkerInfo", "code marker_type offset size" )

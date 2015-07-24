@@ -4,6 +4,7 @@ import threading, time, pygame
 
 from arenas import PiratePlunderArena, CTFArena, TwoColoursArena
 from display import Display
+from vision import init_marker_info
 
 DEFAULT_GAME = 'pirate-plunder'
 
@@ -19,6 +20,7 @@ class Simulator(object):
         except KeyError:
             game_name = DEFAULT_GAME
         game = GAMES[game_name]
+        init_marker_info(game)
         self.arena = game(**config)
 
         self.display = Display(self.arena)

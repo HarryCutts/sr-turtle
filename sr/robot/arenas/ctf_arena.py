@@ -6,6 +6,7 @@ from math import pi
 
 from arena import Arena, ARENA_MARKINGS_COLOR, ARENA_MARKINGS_WIDTH
 from ..markers import Token
+from ..vision import MARKER_ARENA, MARKER_ROBOT, MARKER_FLAG
 from ..game_object import GameObject
 
 import pypybox2d
@@ -46,6 +47,14 @@ class CTFWall(GameObject):
     surface_name = 'sr/wall.png'
 
 class CTFArena(Arena):
+    marker_offsets = {
+        MARKER_FLAG: 32,
+    }
+
+    marker_sizes = {
+        MARKER_FLAG:  0.25 * (10.0/12),
+    }
+
     start_locations = [(-3.6, -3.6),
                        ( 3.6, -3.6),
                        ( 3.6,  3.6),
@@ -72,7 +81,7 @@ class CTFArena(Arena):
             token_locations = [(0, 0)]
 
         for i, location in enumerate(token_locations):
-            token = Token(self, i, damping=0.5)
+            token = Token(self, i, damping=0.5, token_type=MARKER_FLAG)
             token.location = location
             token.heading = pi/4
             self.objects.append(token)

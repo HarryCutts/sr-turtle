@@ -5,9 +5,20 @@ from math import pi
 from random import random
 
 from arena import Arena, ARENA_MARKINGS_COLOR, ARENA_MARKINGS_WIDTH
+from ..vision import MARKER_ARENA, MARKER_ROBOT, MARKER_PEDESTAL, MARKER_TOKEN
 from ..markers import Token
 
 class PiratePlunderArena(Arena):
+    marker_offsets = {
+        MARKER_PEDESTAL: 32,
+        MARKER_TOKEN: 41
+    }
+
+    marker_sizes = {
+        MARKER_PEDESTAL: 0.2 * (10.0/12),
+        MARKER_TOKEN: 0.2 * (10.0/12)
+    }
+
     start_locations = [( 0, -3),
                        ( 3,  0),
                        ( 0,  3),
