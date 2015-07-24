@@ -50,9 +50,12 @@ class Token(GameObject):
     def release(self):
         self.grabbed = False
 
+    surface_name_released = 'sr/token.png'
+    surface_name_grabbed  = 'sr/token_grabbed.png'
+
     @property
     def surface_name(self):
-        return 'sr/token{0}.png'.format('_grabbed' if self.grabbed else '')
+        return self.surface_name_grabbed if self.grabbed else self.surface_name_released
 
 class WallMarker(GameObject):
     surface_name = 'sr/wall_marker.png'
