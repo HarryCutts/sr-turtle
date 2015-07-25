@@ -36,11 +36,13 @@ class RobotThread(threading.Thread):
 
     def run(self):
         def robot():
-            robot_object = SimRobot(sim)
-            robot_object.zone = self.zone
-            robot_object.location = sim.arena.start_locations[self.zone]
-            robot_object.heading = sim.arena.start_headings[self.zone]
-            return robot_object
+            with sim.arena.physics_lock:
+                robot_object = SimRobot(sim)
+                robot_object.zone = self.zone
+                robot_object.location = sim.arena.start_locations[self.zone]
+                robot_object.heading = sim.arena.start_headings[self.zone]
+                return robot_object
+
         exec self.script in {'Robot': robot}
 
 for zone, robot in enumerate(robot_scripts):
